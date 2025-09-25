@@ -1,0 +1,133 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <main>
+        <!-- 🔹 Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-custom shadow-sm py-2">
+            <div class="container-fluid">
+                <!-- Brand / Logo -->
+                <img src="images/GHLogo1.png" alt="GHMS Logo" style="height:40px;" />
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Menu Items -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2">
+                        @* Login *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                                <i class="bi bi-house-door-fill me-1"></i> Login
+                            </NavLink>
+                        </li>
+
+                        @* Dashboard *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="dashboard">
+                                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                            </NavLink>
+                        </li>
+
+                        @* Room Booking *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="room-scheduler">
+                                <i class="bi bi-plus-square-fill me-1"></i> Room Booking
+                            </NavLink>
+                        </li>
+
+                        @* Travel Desk *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="traveldesk">
+                                <i class="bi bi-briefcase-fill me-1"></i> Travel Desk
+                            </NavLink>
+                        </li>
+
+                        @* Booking History *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="booking-history">
+                                <i class="bi bi-clock-history me-1"></i> History
+                            </NavLink>
+                        </li>
+
+                        @* Rooms *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="rooms">
+                                <i class="bi bi-door-closed me-1"></i> Rooms
+                            </NavLink>
+                        </li>
+
+                        @* Bookings *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="bookings">
+                                <i class="bi bi-journal-check me-1"></i> Bookings
+                            </NavLink>
+                        </li>
+
+                        @* Reports *@
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="misreport">
+                                <i class="bi bi-file-earmark-text me-1"></i> Report
+                            </NavLink>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 🔹 Styles -->
+        <style>
+            .bg-custom {
+                background-color: #0D2360 !important;
+            }
+
+            /* NavLink active underline */
+            .nav-link.active {
+                font-weight: 600;
+                color: #fff !important;
+            }
+
+            .nav-link.active::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background-color: #F68E1E;
+                border-radius: 2px;
+                transition: all 0.3s ease;
+            }
+
+            /* Hover effect */
+            .nav-link {
+                position: relative;
+                transition: color 0.2s;
+            }
+
+            .nav-link:hover {
+                color: #F68E1E !important;
+            }
+
+            /* Navbar tweaks */
+            .navbar-nav .nav-item {
+                margin-right: 10px;
+            }
+
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+            .navbar-toggler {
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+            }
+        </style>
+
+        <!-- 🔹 Page Content -->
+        <article class="content p-4">
+            @Body
+        </article>
+    </main>
+</div>

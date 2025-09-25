@@ -1,0 +1,149 @@
+﻿@page "/traveldesk"
+@using GHMS.Shared.Models
+@using Syncfusion.Blazor.Grids
+@inject HttpClient Http
+
+<PageTitle>Travel Desk - Pending Bookings</PageTitle>
+
+<h3 class="mb-3">Travel Desk - Pending Bookings</h3>
+
+<div class="d-flex flex-wrap mb-3 gap-2 align-items-center">
+    <input class="form-control" style="width:250px;" placeholder="Search Guest, Room, Department..."
+           @bind="searchText" @bind:event="oninput" />
+    <button class="btn btn-outline-secondary" @onclick="ClearSearch">Clear</button>
+</div>
+
+<div style="height:650px; overflow:auto;"> <!-- Fixed container to prevent page scroll -->
+    <SfGrid TItem="BookingRequest"
+            DataSource="@FilteredBookings"
+            AllowPaging="true"
+            AllowSorting="true"
+            AllowFiltering="true"
+            PageSettings="new GridPageSettings { PageSize = 10 }"
+            AllowResizing="true"
+            Height="100%"
+            CssClass="travel-desk-grid">
+
+        <GridColumns>
+            <GridColumn Field=@nameof(BookingRequest.Id) HeaderText="Booking ID" Width="90" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.GuestName) HeaderText="Guest Name" Width="150"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.GuestEmail) HeaderText="Guest Email" Width="180"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.HrEmail) HeaderText="HR Email" Width="180"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.Department) HeaderText="Department" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.BandLevel) HeaderText="Band Level" Width="100"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.RoomNumber) HeaderText="Room No" Width="100"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.RoomType) HeaderText="Room Type" Width="100"></GridColumn>
+
+            <GridColumn Field=@nameof(BookingRequest.CheckInDate) HeaderText="Check-In" Format="dd MMM yyyy" Width="120" TextAlign="TextAlign.Center">
+                <Template Context="bookingObj">
+                    @{
+                        var booking = bookingObj as BookingRequest;
+                        bool isToday = booking?.CheckInDate.HasValue == true && booking.CheckInDate.Value.Date == DateTime.Today;
+                        string bgColor = isToday ? "#FFF3CD" : "transparent";
+                    }
+                    <span style="background-color:@bgColor; padding:2px 4px; border-radius:3px;">
+                        @(booking?.CheckInDate.HasValue == true ? booking.CheckInDate.Value.ToString("dd MMM yyyy") : "-")
+                    </span>
+                </Template>
+            </GridColumn>
+
+            <GridColumn Field=@nameof(BookingRequest.CheckOutDate) HeaderText="Check-Out" Format="dd MMM yyyy" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+
+            <GridColumn Field=@nameof(BookingRequest.Status) HeaderText="Status" Width="120" TextAlign="TextAlign.Center">
+                <Template Context="bookingObj">
+                    @{
+                        var booking = bookingObj as BookingRequest;
+                        string color = booking?.Status == BookingStatus.Approved ? "#198754" :
+                                       booking?.Status == BookingStatus.Rejected ? "#dc3545" : "#fd7e14";
+                    }
+                    <span class="badge" style="background-color:@color; color:white;">@booking?.Status</span>
+                </Template>
+            </GridColumn>
+
+            <GridColumn Field=@nameof(BookingRequest.Remarks) HeaderText="Remarks" Width="200"></GridColumn>
+
+            <GridColumn HeaderText="Approval Doc" Width="150">
+                <Template Context="bookingObj">
+                    @if (!string.IsNullOrWhiteSpace((bookingObj as BookingRequest)?.ApprovalDocument))
+                    {
+                        <a href="@((bookingObj as BookingRequest)?.ApprovalDocument)" target="_blank" title="View Approval Document">View</a>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </Template>
+            </GridColumn>
+
+            <GridColumn HeaderText="Actions" Width="180">
+                <Template Context="bookingObj">
+                    @{
+                        var booking = bookingObj as BookingRequest;
+                    }
+                    @if (booking != null)
+                    {
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm" title="Approve Booking"
+                                    @onclick="() => ApproveBooking(booking)">Approve</button>
+                            <button class="btn btn-danger btn-sm" title="Reject Booking"
+                                    @onclick="() => RejectBooking(booking)">Reject</button>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+
+@code {
+    private string searchText { get; set; } = "";
+    private List<BookingRequest> pendingBookings = new();
+    private List<BookingRequest> FilteredBookings => string.IsNullOrWhiteSpace(searchText)
+        ? pendingBookings
+        : pendingBookings.Where(b =>
+            (b.GuestName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (b.RoomNumber?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (b.Department?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+        ).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPendingBookings();
+    }
+
+    private async Task LoadPendingBookings()
+    {
+        pendingBookings = await Http.GetFromJsonAsync<List<BookingRequest>>("api/bookings/pending") ?? new();
+    }
+
+    private async Task ApproveBooking(BookingRequest booking)
+    {
+        booking.Status = BookingStatus.Approved;
+        await Http.PostAsJsonAsync("api/bookings/update-status", booking);
+
+        await SendBookingEmail(booking.HrEmail, booking.GuestEmail, "Booking Approved",
+            $"Room {booking.RoomNumber} has been approved for guest {booking.GuestName}.");
+
+        await LoadPendingBookings();
+    }
+
+    private async Task RejectBooking(BookingRequest booking)
+    {
+        booking.Status = BookingStatus.Rejected;
+        await Http.PostAsJsonAsync("api/bookings/update-status", booking);
+
+        await SendBookingEmail(booking.HrEmail, string.Empty, "Booking Rejected",
+            $"Room {booking.RoomNumber} booking for guest {booking.GuestName} has been rejected.");
+
+        await LoadPendingBookings();
+    }
+
+    private async Task SendBookingEmail(string hrEmail, string guestEmail, string subject, string body)
+    {
+        var recipients = string.IsNullOrEmpty(guestEmail) ? new[] { hrEmail } : new[] { hrEmail, guestEmail };
+        var email = new EmailRequest { Recipients = recipients, Subject = subject, Body = body };
+        await Http.PostAsJsonAsync("api/email/send", email);
+    }
+
+    private void ClearSearch() => searchText = "";
+}

@@ -1,0 +1,67 @@
+﻿@page "/booking-history"
+@using GHMS.Shared.Models
+@using Syncfusion.Blazor.Grids
+@inject HttpClient Http
+
+<h3>Booking History</h3>
+
+<div class="mb-3">
+    <button class="btn me-2 @GetButtonClass(BookingStatus.Pending)" @onclick="() => SelectTab(BookingStatus.Pending)">
+        Pending
+    </button>
+    <button class="btn me-2 @GetButtonClass(BookingStatus.Approved)" @onclick="() => SelectTab(BookingStatus.Approved)">
+        Approved
+    </button>
+    <button class="btn @GetButtonClass(BookingStatus.Rejected)" @onclick="() => SelectTab(BookingStatus.Rejected)">
+        Rejected
+    </button>
+</div>
+
+@if (filteredBookings == null || !filteredBookings.Any())
+{
+    <p>No bookings in this category.</p>
+}
+else
+{
+    <SfGrid TItem="BookingRequest" DataSource="@filteredBookings" AllowPaging="true" AllowSorting="true" AllowFiltering="true">
+        <GridPageSettings PageSize="10"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(BookingRequest.Id) HeaderText="ID" Width="80" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.GuestEmail) HeaderText="Guest Email" Width="180"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.HrEmail) HeaderText="HR Email" Width="180"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.RoomNumber) HeaderText="Room Number" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.RoomType) HeaderText="Room Type" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.Status) HeaderText="Status" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(BookingRequest.RequestDate) HeaderText="Request Date" Format="yyyy-MM-dd HH:mm" Width="160"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+
+@code {
+    private List<BookingRequest> bookings = new();
+    private List<BookingRequest> filteredBookings = new();
+    private BookingStatus selectedTab = BookingStatus.Pending;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch all bookings from server dynamically
+        bookings = await Http.GetFromJsonAsync<List<BookingRequest>>("api/bookings/all") ?? new();
+        FilterBookings();
+    }
+
+    private void SelectTab(BookingStatus status)
+    {
+        selectedTab = status;
+        FilterBookings();
+    }
+
+    private void FilterBookings()
+    {
+        filteredBookings = bookings.Where(b => b.Status == selectedTab).ToList();
+    }
+
+    private string GetButtonClass(BookingStatus status)
+    {
+        return selectedTab == status ? "btn-primary" : "btn-outline-primary";
+    }
+}

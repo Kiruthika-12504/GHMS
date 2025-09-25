@@ -1,0 +1,234 @@
+@page "/misreport"
+@using Syncfusion.Blazor.Grids
+@inject IJSRuntime JS
+@using System.Globalization
+
+<PageTitle>MIS Report</PageTitle>
+
+<div class="toolbar mb-3 d-flex flex-wrap align-items-center gap-2">
+    <!-- Period selection -->
+    <div class="d-flex gap-2 align-items-center">
+        <select class="form-select" style="width:180px;" @onchange="PeriodChanged">
+            <option value="All">All</option>
+            <option value="Month">This Month</option>
+            <option value="Year">This Year</option>
+            <option value="Custom">Custom Range</option>
+        </select>
+
+        @if (IsCustomRange)
+        {
+            <InputDate @bind-Value="CustomStart" class="form-control" style="width:150px;" />
+            <InputDate @bind-Value="CustomEnd" class="form-control" style="width:150px;" />
+            <button class="btn btn-outline-primary" @onclick="ApplyCustomRange">Apply</button>
+        }
+        else if (IsMonthYearFilter)
+        {
+            <select class="form-select" style="width:160px;" @bind="SelectedMonth">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                }
+            </select>
+            <select class="form-select" style="width:100px;" @bind="SelectedYear">
+                @for (int y = 2023; y <= DateTime.Now.Year + 2; y++)
+                {
+                    <option value="@y">@y</option>
+                }
+            </select>
+            <button class="btn btn-outline-primary" @onclick="ApplyMonthYearFilter">Apply</button>
+        }
+    </div>
+
+    <!-- Search -->
+    <div class="d-flex gap-2 align-items-center flex-grow-1">
+        <input class="form-control" placeholder="Search Room, Guest, BookedBy" @bind="SearchText" @bind:event="oninput" />
+        <button class="btn btn-outline-primary" @onclick="ApplySearch">Search</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear Filters</button>
+    </div>
+</div>
+
+@if (FilteredBookings.Any())
+{
+    <SfGrid DataSource="@FilteredBookings" AllowPaging="true" AllowSorting="true" AllowFiltering="true">
+        <GridPageSettings PageSize="10"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field="BookingId" HeaderText="Booking ID" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="RoomNo" HeaderText="Room No" Width="120"></GridColumn>
+            <GridColumn Field="RoomType" HeaderText="Room Type" Width="150"></GridColumn>
+            <GridColumn Field="GuestName" HeaderText="Guest Name" Width="200"></GridColumn>
+            <GridColumn Field="GuestEmail" HeaderText="Guest Email" Width="220"></GridColumn>
+            <GridColumn Field="StayedGuestCount" HeaderText="Stayed Guests" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="DurationOfStay" HeaderText="Duration (Days)" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="BookedBy" HeaderText="Booked By" Width="120"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-success" @onclick="ExportExcelClient">Export to Excel</button>
+        <button class="btn btn-danger" @onclick="ExportPdfClient">Export to PDF</button>
+    </div>
+}
+else
+{
+    <p class="text-muted mt-3">No bookings found for the selected filters.</p>
+}
+
+<style>
+    .toolbar .btn {
+        transition: all 0.2s ease;
+    }
+    .toolbar .btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+@code {
+    private List<Booking> Bookings = new();
+    private List<Booking> FilteredBookings = new();
+
+    private SfGrid<Booking>? Grid;
+
+    private string SearchText { get; set; } = "";
+    private bool IsCustomRange { get; set; } = false;
+    private bool IsMonthYearFilter { get; set; } = false;
+    private DateTime? CustomStart { get; set; }
+    private DateTime? CustomEnd { get; set; }
+
+    private int SelectedMonth { get; set; } = DateTime.Now.Month;
+    private int SelectedYear { get; set; } = DateTime.Now.Year;
+
+    protected override void OnInitialized()
+    {
+        // sample data
+        Bookings = new List<Booking>
+        {
+            new Booking { BookingId=1, RoomNo="101", RoomType="Single", GuestName="John Doe", GuestEmail="john@mail.com", StayedGuestCount=1, DurationOfStay=3, BookedBy="HR", CheckIn=new DateTime(2025,9,12)},
+            new Booking { BookingId=2, RoomNo="102", RoomType="Double", GuestName="Alice Smith", GuestEmail="alice@mail.com", StayedGuestCount=2, DurationOfStay=5, BookedBy="Admin", CheckIn=new DateTime(2025,9,15)}
+        };
+        FilteredBookings = Bookings.ToList();
+    }
+
+    private void PeriodChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        IsCustomRange = value == "Custom";
+        IsMonthYearFilter = value == "Month" || value == "Year";
+
+        switch (value)
+        {
+            case "All":
+                FilteredBookings = Bookings.ToList();
+                break;
+            case "Month":
+            case "Year":
+                ApplyMonthYearFilter();
+                break;
+        }
+    }
+
+    private void ApplyMonthYearFilter()
+    {
+        if (IsMonthYearFilter)
+        {
+            FilteredBookings = Bookings.Where(b =>
+                b.CheckIn.HasValue &&
+                b.CheckIn.Value.Month == SelectedMonth &&
+                b.CheckIn.Value.Year == SelectedYear
+            ).ToList();
+        }
+    }
+
+    private void ApplyCustomRange()
+    {
+        if (CustomStart.HasValue && CustomEnd.HasValue)
+        {
+            FilteredBookings = Bookings.Where(b =>
+                b.CheckIn.HasValue &&
+                b.CheckIn.Value.Date >= CustomStart.Value.Date &&
+                b.CheckIn.Value.Date <= CustomEnd.Value.Date
+            ).ToList();
+        }
+    }
+
+    private void ApplySearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredBookings = Bookings.ToList();
+        }
+        else
+        {
+            FilteredBookings = FilteredBookings.Where(b =>
+                (b.RoomNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (b.RoomType?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (b.GuestName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (b.BookedBy?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false)
+            ).ToList();
+        }
+    }
+
+    private void ClearFilters()
+    {
+        FilteredBookings = Bookings.ToList();
+        SearchText = "";
+        IsCustomRange = false;
+        IsMonthYearFilter = false;
+        CustomStart = null;
+        CustomEnd = null;
+        SelectedMonth = DateTime.Now.Month;
+        SelectedYear = DateTime.Now.Year;
+    }
+
+    private async Task ExportExcelClient()
+    {
+        if (FilteredBookings.Any())
+        {
+            var data = FilteredBookings.Select(b => new {
+                b.BookingId,
+                b.RoomNo,
+                b.RoomType,
+                b.GuestName,
+                b.GuestEmail,
+                b.StayedGuestCount,
+                b.DurationOfStay,
+                b.BookedBy
+            });
+            await JS.InvokeVoidAsync("exportToExcel", data, "MISReport.xlsx");
+        }
+    }
+
+    private async Task ExportPdfClient()
+    {
+        if (FilteredBookings.Any())
+        {
+            var data = FilteredBookings.Select(b => new {
+                b.BookingId,
+                b.RoomNo,
+                b.RoomType,
+                b.GuestName,
+                b.GuestEmail,
+                b.StayedGuestCount,
+                b.DurationOfStay,
+                b.BookedBy
+            });
+            await JS.InvokeVoidAsync("exportToPDF", data, "MISReport.pdf");
+        }
+    }
+
+    public class Booking
+    {
+        public int BookingId { get; set; }
+        public string RoomNo { get; set; } = string.Empty;
+        public string RoomType { get; set; } = string.Empty;
+        public string GuestName { get; set; } = string.Empty;
+        public string GuestEmail { get; set; } = string.Empty;
+        public int StayedGuestCount { get; set; }
+        public int DurationOfStay { get; set; }
+        public string BookedBy { get; set; } = string.Empty;
+        public DateTime? CheckIn { get; set; }
+    }
+}

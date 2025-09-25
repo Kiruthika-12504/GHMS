@@ -1,0 +1,509 @@
+@page "/dashboard"
+@inject IJSRuntime JS
+ 
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* prevent page scroll */
+}
+ 
+/* Smooth fade + slide down animation for the room grid */
+.grid-container {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+ 
+.grid-container.show {
+    max-height: 1000px; /* large enough for your grid */
+    opacity: 1;
+}
+ 
+.dashboard-layout {
+    height: 100vh; /* full viewport */
+}
+ 
+.left-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    overflow: hidden; /* prevent scroll */
+}
+.left-side.full-width {
+    width: 100% !important;
+}
+ 
+.right-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 480px;
+    overflow-y: auto;  /* keep scroll */
+    padding-right: 4px; /* avoid scrollbar overlap */
+}
+ 
+.right-side .bg-white {
+    height: 660px; /* fixed height */
+    flex-shrink: 0;
+}
+ 
+/* Fullscreen view for grid */
+.grid-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    z-index: 1050;
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: 100%;
+    opacity: 1 !important;
+}
+ 
+.grid-container.fullscreen button.close-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 1060;
+}
+ 
+.grid-container.fullscreen button.close-btn {
+    position: static; /* reset absolute positioning */
+    margin-top: 1rem;
+}
+ 
+.three-dot-btn {
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+}
+ 
+.chart-card {
+    position: relative; /* for absolute menu positioning */
+}
+ 
+/* Fullscreen for charts */
+.chart-card.fullscreen {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100% !important;
+    height: 90% !important;
+    z-index: 3000;
+    border-radius: 0;
+}
+ 
+@* .chart-card.fullscreen canvas {
+    width: 100% !important;
+    height: 100% !important;
+} *@
+ 
+.chart-menu {
+    top: 2rem;
+    right: 0.5rem;
+    width: auto;          /* shrink to fit the text */
+    min-width: 60px;      /* optional: ensure not too small */
+    max-width: 200px;     /* optional: prevent over-expansion */
+    padding: 0.25rem 0.5rem;
+    z-index: 1000;
+    white-space: nowrap;  /* keep text in a single line */
+}
+ 
+.chart-menu .menu-item {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+ 
+.chart-menu .menu-item:hover {
+    background-color: #f0f0f0;
+}
+</style>
+ 
+ 
+<PageTitle>Guest House Dashboard</PageTitle>
+ 
+<div class="container-fluid dashboard-layout p-2">
+    <div class="row g-2 h-100">
+        <!-- Left Side -->
+        <div class="col-9 left-side">
+ 
+            <!-- Top KPI Cards Row -->
+<!-- Top KPI Cards Row -->
+<!-- Top KPI Cards Row -->
+<div class="d-flex gap-2 mb-3" style="width:100%;">
+ 
+    <!-- Rooms Card -->
+    <div class="card shadow-sm text-center flex-fill" style="height:120px; cursor:pointer; font-size:0.8rem;">
+        <div class="card-body d-flex flex-column justify-content-between p-1 h-100">
+            <div class="fw-bold d-flex justify-content-between align-items-center">
+                Rooms
+                <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn">⋮</button>
+            </div>
+            <div class="fw-bold mb-1 text-primary" style="font-size:1rem;">17</div>
+            <div class="text-muted mb-1 border-bottom pb-1">Total</div>
+            <div class="d-flex justify-content-around fw-bold">
+                <div class="text-success border-end pe-1 text-truncate">10 Avail</div>
+                <div class="text-danger ps-1 text-truncate">7 Occ</div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Booking Card -->
+    <div class="card shadow-sm text-center flex-fill" style="height:120px; cursor:pointer; font-size:0.8rem;">
+        <div class="card-body d-flex flex-column justify-content-between p-1 h-100">
+            <div class="fw-bold d-flex justify-content-between align-items-center">
+                Booking
+                <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn">⋮</button>
+            </div>
+            <div class="fw-bold mb-1 text-primary" style="font-size:1rem;">25</div>
+            <div class="text-muted mb-1 border-bottom pb-1">Total</div>
+            <div class="d-flex justify-content-around fw-bold">
+                <div class="text-success border-end pe-1 text-truncate">15 Conf</div>
+                <div class="text-danger ps-1 text-truncate">10 Pend</div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Check-In Card -->
+    <div class="card shadow-sm text-center flex-fill" style="height:120px; cursor:pointer; font-size:0.8rem;">
+        <div class="card-body d-flex flex-column justify-content-between p-1 h-100">
+            <div class="fw-bold d-flex justify-content-between align-items-center">
+                Check-In
+                <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn">⋮</button>
+            </div>
+            <div class="fw-bold mb-1 text-primary" style="font-size:1rem;">12</div>
+            <div class="text-muted mb-1 border-bottom pb-1">Total</div>
+            <div class="d-flex justify-content-around fw-bold">
+                <div class="text-success border-end pe-1 text-truncate">6 Rep</div>
+                <div class="text-danger ps-1 text-truncate">6 Not</div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Check-Out Card -->
+    <div class="card shadow-sm text-center flex-fill" style="height:120px; cursor:pointer; font-size:0.8rem;">
+        <div class="card-body d-flex flex-column justify-content-between p-1 h-100">
+            <div class="fw-bold d-flex justify-content-between align-items-center">
+                Check-Out
+                <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn">⋮</button>
+            </div>
+            <div class="fw-bold mb-1 text-primary" style="font-size:1rem;">8</div>
+            <div class="text-muted mb-1 border-bottom pb-1">Total</div>
+            <div class="d-flex justify-content-around fw-bold">
+                <div class="text-success border-end pe-1 text-truncate">5 Comp</div>
+                <div class="text-danger ps-1 text-truncate">3 Pend</div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Guest Card -->
+    <div class="card shadow-sm text-center flex-fill" style="height:120px; cursor:pointer; font-size:0.8rem;">
+        <div class="card-body d-flex flex-column justify-content-between p-1 h-100">
+            <div class="fw-bold d-flex justify-content-between align-items-center">
+                Guest
+                <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn">⋮</button>
+            </div>
+            <div class="fw-bold mb-1 text-primary" style="font-size:1rem;">30</div>
+            <div class="text-muted mb-1 border-bottom pb-1">Total</div>
+            <div class="d-flex justify-content-around fw-bold">
+                <div class="text-success border-end pe-1 text-truncate">20 In</div>
+                <div class="text-danger ps-1 text-truncate">10 Out</div>
+            </div>
+        </div>
+    </div>
+ 
+</div>
+ 
+ 
+ 
+ 
+ 
+            <!-- View All Button -->
+            @if (!isFullScreen && showRoomGrid)
+            {
+                <button class="btn btn-sm btn-primary mb-2" @onclick="ShowAllGrid">View All</button>
+            }
+ 
+            <!-- Dynamic Grid -->
+            <div class="mb-3 grid-container @(showRoomGrid ? "show" : "") @(isFullScreen ? "fullscreen" : "")" @key="activeCard">
+                @if (showRoomGrid)
+                {
+                    <div id="roomsGrid"></div>
+                    <div class="mt-2 text-muted"></div>
+ 
+                    @if (isFullScreen)
+                    {
+                        <div class="text-center mt-3">
+                            <button class="btn btn-sm btn-danger close-btn" @onclick="CloseFullScreen">Close</button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+ 
+@if (showCharts)
+{
+    <div class="col-3 right-side" style="width:300px;">
+        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                style="z-index:5000;"
+                @onclick="CloseChartsArea">
+            ✖
+        </button>
+ 
+        @if (focusedChart == null || focusedChart == "Booking")
+        {
+            <!-- Booking Chart Card -->
+            <div class="bg-white shadow rounded-3 p-2 flex-shrink-0 chart-card @(focusedChart == "Booking" ? "fullscreen" : "")" style="height:180px; width:100%;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h2 class="h6 fw-bold mb-0">Booking</h2>
+                    <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn"
+                            @onclick='() => ShowChartMenu("Booking")'>⋮</button>
+                </div>
+                <canvas id="bookingChart"></canvas>
+ 
+                @if (activeChartMenu == "Booking")
+                {
+                    <div class="chart-menu position-absolute bg-white shadow rounded p-2" style="height:60px;">
+                        <div class="menu-item" @onclick='() => ViewChart("Booking")'>View</div>
+                    </div>
+                }
+ 
+                @if (focusedChart == "Booking")
+                {
+                    <div class="text-end mt-3">
+                        <button class="btn btn-sm btn-danger" @onclick="CloseFocusedChart">Close</button>
+                    </div>
+                }
+            </div>
+        }
+ 
+        @if (focusedChart == null || focusedChart == "Segmentation")
+        {
+            <!-- Segmentation Chart Card -->
+            <div class="bg-white shadow rounded-3 p-2 flex-shrink-0 chart-card @(focusedChart == "Segmentation" ? "fullscreen" : "")" style="height:180px; width:100%;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h2 class="h6 fw-bold mb-0">Segmentation</h2>
+                    <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn"
+                            @onclick='() => ShowChartMenu("Segmentation")'>⋮</button>
+                </div>
+                <canvas id="segmentationChart"></canvas>
+ 
+                @if (activeChartMenu == "Segmentation")
+                {
+                    <div class="chart-menu position-absolute bg-white shadow rounded p-2" style="height:60px;">
+                        <div class="menu-item" @onclick='() => ViewChart("Segmentation")'>View</div>
+                    </div>
+                }
+ 
+                @if (focusedChart == "Segmentation")
+                {
+                    <div class="text-end mt-3">
+                        <button class="btn btn-sm btn-danger" @onclick="CloseFocusedChart">Close</button>
+                    </div>
+                }
+            </div>
+        }
+ 
+        @if (focusedChart == null || focusedChart == "CheckInOut")
+        {
+            <!-- Check-In vs Check-Out Chart Card -->
+            <div class="bg-white shadow rounded-3 p-2 flex-shrink-0 chart-card @(focusedChart == "CheckInOut" ? "fullscreen" : "")" style="height:180px; width:100%;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h2 class="h6 fw-bold mb-0">Check-In vs Check-Out</h2>
+                    <button class="btn btn-sm btn-light border-0 p-0 three-dot-btn"
+                            @onclick='() => ShowChartMenu("CheckInOut")'>⋮</button>
+                </div>
+                <canvas id="checkInOutChart"></canvas>
+ 
+                @if (activeChartMenu == "CheckInOut")
+                {
+                    <div class="chart-menu position-absolute bg-white shadow rounded p-2" style="height:60px;">
+                        <div class="menu-item" @onclick='() => ViewChart("CheckInOut")'>View</div>
+                    </div>
+                }
+ 
+                @if (focusedChart == "CheckInOut")
+                {
+                    <div class="text-end mt-3">
+                        <button class="btn btn-sm btn-danger" @onclick="CloseFocusedChart">Close</button>
+                    </div>
+                }
+            </div>
+        }
+ 
+    </div>
+}
+   
+    </div>
+</div>
+ 
+@code {
+    private bool showRoomGrid = true;
+    private bool showCharts = true;
+    private string activeCard = "";
+    private bool isFullScreen = false;
+    private bool tableInitialized = false;
+    private string focusedChart = null;
+ 
+    public List<Room> Rooms { get; set; } = new()
+    {
+        new Room { RoomNo="001", Type="Single", Capacity=1, Status="Occupied", CurrentGuest="Richard", CheckIn="22 Sept 2025", CheckOut="24 Sept 2025", Remarks="NIL" },
+        new Room { RoomNo="002", Type="Double", Capacity=2, Status="Occupied", CurrentGuest="Peter & Anna", CheckIn="22 Sept 2025", CheckOut="23 Sept 2025", Remarks="VIP" },
+        new Room { RoomNo="003", Type="Single", Capacity=1, Status="Available", CurrentGuest="", CheckIn="", CheckOut="", Remarks="NIL" },
+        new Room { RoomNo="004", Type="Suite", Capacity=3, Status="Occupied", CurrentGuest="Kevin & Family", CheckIn="21 Sept 2025", CheckOut="25 Sept 2025", Remarks="NIL" },
+        new Room { RoomNo="005", Type="Double", Capacity=2, Status="Booked", CurrentGuest="", CheckIn="23 Sept 2025", CheckOut="24 Sept 2025", Remarks="NIL" },
+        new Room { RoomNo="006", Type="Single", Capacity=1, Status="Available", CurrentGuest="", CheckIn="", CheckOut="", Remarks="NIL" },
+        new Room { RoomNo="007", Type="Double", Capacity=2, Status="Occupied", CurrentGuest="Sophia & Mark", CheckIn="22 Sept 2025", CheckOut="24 Sept 2025", Remarks="NIL" },
+        new Room { RoomNo="008", Type="Suite", Capacity=4, Status="Booked", CurrentGuest="", CheckIn="23 Sept 2025", CheckOut="26 Sept 2025", Remarks="NIL" },
+        new Room { RoomNo="009", Type="Single", Capacity=1, Status="Occupied", CurrentGuest="John", CheckIn="21 Sept 2025", CheckOut="22 Sept 2025", Remarks="Late Check-Out" },
+        new Room { RoomNo="010", Type="Double", Capacity=2, Status="Available", CurrentGuest="", CheckIn="", CheckOut="", Remarks="NIL" },
+    };
+ 
+    public class Room
+    {
+        public string RoomNo { get; set; }
+        public string Type { get; set; }
+        public int Capacity { get; set; }
+        public string Status { get; set; }
+        public string CurrentGuest { get; set; }
+        public string CheckIn { get; set; }
+        public string CheckOut { get; set; }
+        public string Remarks { get; set; }
+    }
+ 
+    private void ToggleGrid(string cardName)
+    {
+        if (activeCard == cardName)
+        {
+            activeCard = "";
+            showRoomGrid = false;
+        }
+        else
+        {
+            activeCard = cardName;
+            showRoomGrid = false;
+ 
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(50);
+                showRoomGrid = true;
+                tableInitialized = false; // reset for new card
+                InvokeAsync(StateHasChanged);
+            });
+        }
+    }
+ 
+    private async Task ToggleCharts()
+    {
+        showCharts = !showCharts;
+        StateHasChanged();
+ 
+        if (showCharts)
+        {
+            await Task.Delay(100);
+            await JS.InvokeVoidAsync("Dashboard.initCharts");
+        }
+    }
+ 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("eval", $"window.RoomsData = {System.Text.Json.JsonSerializer.Serialize(Rooms)}");
+            await JS.InvokeVoidAsync("Dashboard.initCards");
+            await JS.InvokeVoidAsync("Dashboard.initCharts");
+        }
+ 
+        if (showRoomGrid && !tableInitialized)
+        {
+            tableInitialized = true;
+            await JS.InvokeVoidAsync("eval", $"window.RoomsData = {System.Text.Json.JsonSerializer.Serialize(Rooms)}");
+            await JS.InvokeVoidAsync("Dashboard.initTable", isFullScreen);
+        }
+    }
+ 
+    private async Task ShowAllGrid()
+    {
+        isFullScreen = true;
+        tableInitialized = false;
+        await InvokeAsync(StateHasChanged);
+        await JS.InvokeVoidAsync("Dashboard.initTable", true);
+    }
+ 
+    private async Task CloseFullScreen()
+    {
+        isFullScreen = false;
+        showRoomGrid = false;
+        activeCard = "";
+        tableInitialized = false;
+        await InvokeAsync(StateHasChanged);
+ 
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(50);
+            showRoomGrid = true;
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+ 
+    private string activeChartMenu = null;
+ 
+    private void ShowChartMenu(string chartName)
+    {
+        if (activeChartMenu == chartName)
+            activeChartMenu = null; // toggle off
+        else
+            activeChartMenu = chartName;
+    }
+ 
+    private async Task ViewChart(string chartName)
+{
+    focusedChart = chartName;
+    activeChartMenu = null; // close menu
+    StateHasChanged();
+ 
+    // Allow DOM update before JS runs
+    await Task.Delay(50);
+ 
+    // Re-render and resize the full chart
+    await JS.InvokeVoidAsync("Dashboard.initFullChart", chartName);
+    await JS.InvokeVoidAsync("Dashboard.resizeChart", chartName);
+}
+ 
+    private async Task CloseFocusedChart()
+    {
+        focusedChart = null;   // exit fullscreen
+        activeChartMenu = null;
+        StateHasChanged();
+ 
+        // Wait for DOM update before reinitializing
+        await Task.Delay(50);
+ 
+        // Re-init small charts
+        await JS.InvokeVoidAsync("Dashboard.initCharts");
+    }
+    private string? activeCardMenu = null;
+ 
+ 
+    private void ShowCardMenu(string cardName)
+    {
+        if (activeCardMenu == cardName)
+            activeCardMenu = null; // toggle off
+        else
+            activeCardMenu = cardName;
+    }
+    private void CloseChartsArea()
+    {
+        showCharts = false;   // removes the entire chart column from the DOM
+    }
+ 
+}
+ 

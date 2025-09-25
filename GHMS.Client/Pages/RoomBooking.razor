@@ -1,0 +1,182 @@
+﻿@page "/room"
+@using System.ComponentModel.DataAnnotations
+@using GHMS.Shared.Models
+@inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Room Booking</h3>
+
+<EditForm Model="@booking" OnValidSubmit="BookRoom">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Guest Name:</label>
+        <InputText @bind-Value="booking.GuestName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Guest Email:</label>
+        <InputText @bind-Value="booking.GuestEmail" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Gender:</label>
+        <InputSelect @bind-Value="booking.Gender" class="form-control">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Mobile Number:</label>
+        <InputText @bind-Value="booking.MobileNumber" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Occupancy Category:</label>
+        <InputSelect @bind-Value="booking.OccupancyCategory" class="form-control">
+            <option value="">Select</option>
+            <option>Single</option>
+            <option>Double</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Sub Category:</label>
+        <InputSelect @bind-Value="booking.SubCategory" class="form-control">
+            <option value="">Select</option>
+            <option>Spouse</option>
+            <option>Parent</option>
+            <option>Other</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Department:</label>
+        <InputText @bind-Value="booking.Department" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Band Level:</label>
+        <InputText @bind-Value="booking.BandLevel" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Select Room:</label>
+        <InputSelect @bind-Value="booking.RoomId" class="form-control">
+            @foreach (var room in rooms)
+            {
+                <option value="@room.Id">@room.Name (@(room.IsAvailable ? "Available" : "Booked"))</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Check-In Date:</label>
+        <InputDate @bind-Value="booking.CheckInDate" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Check-Out Date:</label>
+        <InputDate @bind-Value="booking.CheckOutDate" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Remarks:</label>
+        <InputTextArea @bind-Value="booking.Remarks" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Upload Approval Document (optional):</label>
+        <InputFile OnChange="HandleFileUpload" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Book Room</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p class="mt-2">@message</p>
+}
+
+@code {
+    private BookingRequest booking = new();
+    private List<Room> rooms = new();
+    private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await Http.GetFromJsonAsync<List<Room>>("api/rooms") ?? new();
+        if (rooms.Any())
+            booking.RoomId = rooms.First().Id;
+
+        booking.Status = BookingStatus.Pending;
+        booking.RequestDate = DateTime.Now;
+        booking.HrEmail = "hr@example.com"; // default HR email
+    }
+
+    private async Task BookRoom()
+    {
+        var response = await Http.PostAsJsonAsync("api/bookings/create", booking);
+        if (response.IsSuccessStatusCode)
+        {
+            message = "Booking request submitted! Pending approval from Travel Desk.";
+            await SendBookingEmail(booking.HrEmail, "",
+                "New Room Booking Request",
+                $"Room {booking.RoomId} requested for guest {booking.GuestName}.");
+        }
+        else
+        {
+            message = "Failed to submit booking.";
+        }
+    }
+
+    private async Task SendBookingEmail(string hrEmail, string guestEmail, string subject, string body)
+    {
+        var recipients = string.IsNullOrEmpty(guestEmail) ? new[] { hrEmail } : new[] { hrEmail, guestEmail };
+        var email = new EmailRequest { Recipients = recipients, Subject = subject, Body = body };
+        await Http.PostAsJsonAsync("api/email/send", email);
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            // For demo: store file path as file name. In real app, upload to server or blob storage.
+            booking.ApprovalDocument = file.Name;
+        }
+    }
+
+    public class BookingRequest
+    {
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "Guest name is required")]
+        public string GuestName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Guest email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string GuestEmail { get; set; } = string.Empty;
+
+        public string Gender { get; set; } = string.Empty;
+        public string MobileNumber { get; set; } = string.Empty;
+        public string OccupancyCategory { get; set; } = string.Empty;
+        public string SubCategory { get; set; } = string.Empty;
+        public string Department { get; set; } = string.Empty;
+        public string BandLevel { get; set; } = string.Empty;
+
+        public string HrEmail { get; set; } = string.Empty;
+        public int RoomId { get; set; }
+        public DateTime? CheckInDate { get; set; }
+        public DateTime? CheckOutDate { get; set; }
+        public string Remarks { get; set; } = string.Empty;
+        public string ApprovalDocument { get; set; } = string.Empty;
+
+        public BookingStatus Status { get; set; }
+        public DateTime RequestDate { get; set; }
+    }
+}

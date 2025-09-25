@@ -1,0 +1,6 @@
+@GHMS.Server_HostAddress = http://localhost:5259
+
+GET {{GHMS.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

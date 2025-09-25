@@ -1,0 +1,50 @@
+@page "/"
+@inject NavigationManager Navigation
+
+<div class="login-container">
+    <div class="login-card">
+        <!-- Logo and Title -->
+        <div class="logo-section">
+            <img src="images/GHLogo.png" alt="Guest House Logo" class="Mainlogo" />
+            @* <h2 class="app-title">Guest House </h2> *@
+        </div>
+ 
+        <h3 class="welcome-text">Welcome Back</h3>
+        <p class="sub-text">Select method to log in:</p>
+ 
+        <!-- Buttons -->
+        <button class="btn integra-btn" @onclick="NavigateToScheduler">
+    <img src="images/inlogo.png" alt="Integra" class="btn-icon" />
+    Login with Integra
+</button>
+ 
+        <div class="or-text">Or</div>
+ 
+        <button class="btn microsoft-btn">
+            <img src="images/microsoft.png" alt="Microsoft" class="btn-icon" />
+            Login in with Microsoft
+        </button>
+ 
+        <button class="btn google-btn">
+            <img src="images/google.png" alt="Google" class="btn-icon" />
+            Login in with Google
+        </button>
+ 
+        <!-- Footer -->
+        <div class="footer">
+            Powered by <img src="images/integralogo.png" alt="Integra" class="Bottomlogo" />
+        </div>
+    </div>
+ 
+    <!-- Bottom text -->
+    <div class="bottom-footer">
+        © 2025 | Powered By Integra Software Services Pvt. Ltd
+    </div>
+</div>
+
+@code {
+    private void NavigateToScheduler()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+}

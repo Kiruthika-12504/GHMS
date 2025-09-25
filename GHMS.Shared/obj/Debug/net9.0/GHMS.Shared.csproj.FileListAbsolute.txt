@@ -1,0 +1,11 @@
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\bin\Debug\net9.0\GHMS.Shared.deps.json
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\bin\Debug\net9.0\GHMS.Shared.dll
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\bin\Debug\net9.0\GHMS.Shared.pdb
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.AssemblyInfoInputs.cache
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.AssemblyInfo.cs
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.csproj.CoreCompileInputs.cache
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.dll
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\refint\GHMS.Shared.dll
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.pdb
+C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\ref\GHMS.Shared.dll

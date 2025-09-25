@@ -1,0 +1,184 @@
+@page "/add-guesthouse"
+@inject IJSRuntime JS
+@using GHMS.Layout
+@layout MainLayout
+ 
+<PageTitle>Add New Guest House</PageTitle>
+ 
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Add New Guest House</h5>
+        </div>
+        <div class="card-body">
+            <EditForm Model="@newGuestHouse" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+ 
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Guest House Name</label>
+                        <InputText class="form-control" @bind-Value="newGuestHouse.GuestName" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Location</label>
+                        <InputText class="form-control" @bind-Value="newGuestHouse.Location" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Max Occupancy</label>
+                        <InputNumber class="form-control" @bind-Value="newGuestHouse.MaxOccupancy" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Floor Number</label>
+                        <InputNumber class="form-control" @bind-Value="newGuestHouse.FloorNumber" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Amenities (comma separated)</label>
+                        <InputText class="form-control" @bind-Value="newGuestHouse.Amenities" />
+                    </div>
+                </div>
+ 
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-success me-2">Add Guest House</button>
+                    <button type="button" class="btn btn-secondary" @onclick="ResetForm">Reset</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+ 
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Guest Houses List</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Room Id</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Max Occupancy</th>
+                        <th>Floor</th>
+                        <th>Amenities</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var gh in guestHouses)
+                    {
+                        <tr>
+                            @if (editId == gh.Id)
+                            {
+                                <!-- Editable Row -->
+                                <td>@gh.RoomId</td>
+                                <td><InputText class="form-control" @bind-Value="gh.GuestName" /></td>
+                                <td><InputText class="form-control" @bind-Value="gh.Location" /></td>
+                                <td><InputNumber class="form-control" @bind-Value="gh.MaxOccupancy" /></td>
+                                <td><InputNumber class="form-control" @bind-Value="gh.FloorNumber" /></td>
+                                <td><InputText class="form-control" @bind-Value="gh.Amenities" /></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-success me-2" @onclick="@(() => SaveEdit(gh.Id))">Save</button>
+                                    <button class="btn btn-sm btn-secondary" @onclick="CancelEdit">Cancel</button>
+                                </td>
+                            }
+                            else
+                            {
+                                <!-- Normal Row -->
+                                <td>@gh.RoomId</td>
+                                <td>@gh.GuestName</td>
+                                <td>@gh.Location</td>
+                                <td>@gh.MaxOccupancy</td>
+                                <td>@gh.FloorNumber</td>
+                                <td>@gh.Amenities</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary me-2" @onclick="@(() => EditRow(gh.Id))">Edit</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="@(() => DeleteRow(gh.Id))">Delete</button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ 
+@code {
+    private GuestHouse newGuestHouse = new GuestHouse();
+    private List<GuestHouse> guestHouses = new List<GuestHouse>();
+    private const string storageKey = "guestHouses";
+    private Guid? editId = null;
+    private int roomCounter = 1; // keeps track of last room ID
+ 
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await JS.InvokeAsync<string>("localStorage.getItem", storageKey);
+        if (!string.IsNullOrEmpty(data))
+        {
+            guestHouses = System.Text.Json.JsonSerializer.Deserialize<List<GuestHouse>>(data) ?? new List<GuestHouse>();
+ 
+            // continue room counter from last saved
+            if (guestHouses.Any())
+                roomCounter = guestHouses.Max(g => g.RoomId) + 1;
+        }
+    }
+ 
+    private async Task HandleValidSubmit()
+    {
+        newGuestHouse.Id = Guid.NewGuid();
+        newGuestHouse.RoomId = roomCounter++; // auto-generate
+ 
+        guestHouses.Add(new GuestHouse
+        {
+            Id = newGuestHouse.Id,
+            RoomId = newGuestHouse.RoomId,
+            GuestName = newGuestHouse.GuestName,
+            Location = newGuestHouse.Location,
+            MaxOccupancy = newGuestHouse.MaxOccupancy,
+            FloorNumber = newGuestHouse.FloorNumber,
+            Amenities = newGuestHouse.Amenities
+        });
+ 
+        await SaveToStorage();
+        newGuestHouse = new GuestHouse();
+    }
+ 
+    private void ResetForm() => newGuestHouse = new GuestHouse();
+ 
+    private void EditRow(Guid id) => editId = id;
+ 
+    private async Task SaveEdit(Guid id)
+    {
+        editId = null;
+        await SaveToStorage();
+    }
+ 
+    private void CancelEdit() => editId = null;
+ 
+    private async Task DeleteRow(Guid id)
+    {
+        var gh = guestHouses.FirstOrDefault(x => x.Id == id);
+        if (gh != null)
+        {
+            guestHouses.Remove(gh);
+            await SaveToStorage();
+        }
+    }
+ 
+    private async Task SaveToStorage()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(guestHouses);
+        await JS.InvokeVoidAsync("localStorage.setItem", storageKey, json);
+    }
+ 
+    public class GuestHouse
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public int RoomId { get; set; }   // Auto-generated
+        public string GuestName { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public int MaxOccupancy { get; set; }
+        public int FloorNumber { get; set; }
+        public string Amenities { get; set; } = string.Empty;
+    }
+}

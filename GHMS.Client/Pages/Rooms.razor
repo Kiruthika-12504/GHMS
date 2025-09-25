@@ -1,0 +1,187 @@
+@page "/rooms"
+@using Syncfusion.Blazor.Grids
+@using System.Globalization
+
+<PageTitle>Rooms</PageTitle>
+
+<div class="toolbar mb-3 d-flex flex-wrap align-items-center gap-2">
+    <!-- Period selection -->
+    <div class="d-flex gap-2 align-items-center">
+        <select class="form-select" style="width:180px;" @onchange="PeriodChanged">
+            <option value="All">All</option>
+            <option value="Month">This Month</option>
+            <option value="Year">This Year</option>
+            <option value="Custom">Custom Range</option>
+        </select>
+
+        @if (IsCustomRange)
+        {
+            <InputDate @bind-Value="CustomStart" class="form-control" style="width:150px;" />
+            <InputDate @bind-Value="CustomEnd" class="form-control" style="width:150px;" />
+            <button class="btn btn-outline-primary" @onclick="ApplyCustomRange">Apply</button>
+        }
+        else if (IsMonthYearFilter)
+        {
+            <select class="form-select" style="width:160px;" @bind="SelectedMonth">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                }
+            </select>
+            <select class="form-select" style="width:100px;" @bind="SelectedYear">
+                @for (int y = 2023; y <= DateTime.Now.Year + 2; y++)
+                {
+                    <option value="@y">@y</option>
+                }
+            </select>
+            <button class="btn btn-outline-primary" @onclick="ApplyMonthYearFilter">Apply</button>
+        }
+    </div>
+
+    <!-- Search -->
+    <div class="d-flex gap-2 align-items-center flex-grow-1">
+        <input class="form-control" placeholder="Search RoomNo, Type, Status, Guest" @bind="SearchText" @bind:event="oninput" />
+        <button class="btn btn-outline-primary" @onclick="ApplySearch">Search</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear Filters</button>
+    </div>
+</div>
+
+<SfGrid DataSource="@FilteredRooms" AllowPaging="true" AllowSorting="true" AllowFiltering="true">
+    <GridPageSettings PageSize="5"></GridPageSettings>
+    <GridColumns>
+        <GridColumn Field="RoomNo" HeaderText="Room No" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Type" HeaderText="Type" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Capacity" HeaderText="Capacity" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Status" HeaderText="Status" Width="120" TextAlign="TextAlign.Center">
+            <Template>
+                @{
+                    var status = (context as Room)?.Status;
+                    string color = status == "Occupied" ? "red" :
+                                   status == "Available" ? "green" :
+                                   status == "Blocked" ? "gray" :
+                                   status == "Maintenance" ? "orange" : "black";
+                }
+                <span style="font-weight:bold;color:@color">@status</span>
+            </Template>
+        </GridColumn>
+        <GridColumn Field="CurrentGuest" HeaderText="Current Guest" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="CheckIn" HeaderText="Check-In" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="CheckOut" HeaderText="Check-Out" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="Remarks" HeaderText="Remarks" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {
+    private string SearchText { get; set; } = "";
+    private bool IsCustomRange { get; set; } = false;
+    private bool IsMonthYearFilter { get; set; } = false;
+    private DateTime? CustomStart { get; set; }
+    private DateTime? CustomEnd { get; set; }
+
+    private int SelectedMonth { get; set; } = DateTime.Now.Month;
+    private int SelectedYear { get; set; } = DateTime.Now.Year;
+
+    private List<Room> RoomList = new()
+    {
+        new Room{ RoomNo="001", Type="Single", Capacity="01", Status="Occupied", CurrentGuest="Richard", CheckIn="12 Sept 2025", CheckOut="13 Sept 2025", Remarks="NIL"},
+        new Room{ RoomNo="002", Type="Double", Capacity="02", Status="Occupied", CurrentGuest="Peter", CheckIn="12 Sept 2025", CheckOut="13 Sept 2025", Remarks="NIL"},
+        new Room{ RoomNo="004", Type="Single", Capacity="01", Status="Available", CurrentGuest="-", CheckIn="-", CheckOut="-", Remarks="NIL"},
+        new Room{ RoomNo="005", Type="Single", Capacity="01", Status="Blocked", CurrentGuest="-", CheckIn="-", CheckOut="-", Remarks="NIL"},
+        new Room{ RoomNo="006", Type="Double", Capacity="02", Status="Maintenance", CurrentGuest="-", CheckIn="-", CheckOut="-", Remarks="NIL"}
+    };
+
+    private List<Room> FilteredRooms;
+
+    protected override void OnInitialized()
+    {
+        FilteredRooms = RoomList.ToList();
+    }
+
+    private void PeriodChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        IsCustomRange = value == "Custom";
+        IsMonthYearFilter = value == "Month" || value == "Year";
+
+        switch (value)
+        {
+            case "All":
+                FilteredRooms = RoomList.ToList();
+                break;
+            case "Month":
+            case "Year":
+                ApplyMonthYearFilter();
+                break;
+        }
+    }
+
+    private void ApplyMonthYearFilter()
+    {
+        // Example: here you can filter based on CheckIn if you want
+        if (IsMonthYearFilter)
+        {
+            FilteredRooms = RoomList.Where(r =>
+                DateTime.TryParse(r.CheckIn, out var checkIn) &&
+                checkIn.Month == SelectedMonth &&
+                checkIn.Year == SelectedYear
+            ).ToList();
+        }
+    }
+
+    private void ApplyCustomRange()
+    {
+        if (CustomStart.HasValue && CustomEnd.HasValue)
+        {
+            FilteredRooms = RoomList.Where(r =>
+                DateTime.TryParse(r.CheckIn, out var checkIn) &&
+                checkIn.Date >= CustomStart.Value.Date &&
+                checkIn.Date <= CustomEnd.Value.Date
+            ).ToList();
+        }
+    }
+
+    private void ApplySearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredRooms = RoomList.ToList();
+        }
+        else
+        {
+            FilteredRooms = RoomList.Where(r =>
+                (r.RoomNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (r.Type?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (r.Status?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (r.CurrentGuest?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false)
+            ).ToList();
+        }
+    }
+
+    private void ClearFilters()
+    {
+        FilteredRooms = RoomList.ToList();
+        SearchText = "";
+        IsCustomRange = false;
+        IsMonthYearFilter = false;
+        CustomStart = null;
+        CustomEnd = null;
+        SelectedMonth = DateTime.Now.Month;
+        SelectedYear = DateTime.Now.Year;
+    }
+
+    public class Room
+    {
+        public string RoomNo { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Capacity { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string CurrentGuest { get; set; } = "";
+        public string CheckIn { get; set; } = "";
+        public string CheckOut { get; set; } = "";
+        public string Remarks { get; set; } = "";
+    }
+}
