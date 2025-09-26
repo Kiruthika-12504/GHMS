@@ -3,10 +3,12 @@
 <div class="page">
     <main>
         <!-- 🔹 Top Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-custom shadow-sm py-2">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-custom shadow-sm py-2" style="height: 40px;">
             <div class="container-fluid">
                 <!-- Brand / Logo -->
-                <img src="images/GHLogo1.png" alt="GHMS Logo" style="height:40px;" />
+                <NavLink class="navbar-brand d-flex align-items-center" href="/">
+                    <img src="images/GHLogo1.png" alt="GHMS Logo" style="height:40px;" />
+                </NavLink>
 
                 <!-- Mobile Toggle -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -15,69 +17,117 @@
 
                 <!-- Menu Items -->
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2">
-                        @* Login *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                                <i class="bi bi-house-door-fill me-1"></i> Login
-                            </NavLink>
+                    <ul class="navbar-nav mb-2 mb-lg-0 gap-2">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-white-menu" href="dashboard" role="button"
+                                <i class="bi bi-door-closed me-1"></i> Home
+                            </a>
                         </li>
 
-                        @* Dashboard *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="dashboard">
-                                <i class="bi bi-speedometer2 me-1"></i> Dashboard
-                            </NavLink>
-                        </li>
-
-                        @* Room Booking *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="room-scheduler">
-                                <i class="bi bi-plus-square-fill me-1"></i> Room Booking
-                            </NavLink>
-                        </li>
-
-                        @* Travel Desk *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="traveldesk">
-                                <i class="bi bi-briefcase-fill me-1"></i> Travel Desk
-                            </NavLink>
-                        </li>
-
-                        @* Booking History *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="booking-history">
-                                <i class="bi bi-clock-history me-1"></i> History
-                            </NavLink>
-                        </li>
-
-                        @* Rooms *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="rooms">
+                        @* Rooms (white text now) *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white-menu" href="#" id="roomsDropdown1" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-door-closed me-1"></i> Rooms
-                            </NavLink>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="roomsDropdown1">
+                                <li><NavLink class="dropdown-item" href="add-guesthouse">Add New Room</NavLink></li>
+                                <li><NavLink class="dropdown-item" href="rooms">View All Rooms</NavLink></li>
+                                <li><NavLink class="dropdown-item" href="roomstatus">Room Status</NavLink></li>
+                            </ul>
                         </li>
 
-                        @* Bookings *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="bookings">
-                                <i class="bi bi-journal-check me-1"></i> Bookings
-                            </NavLink>
+                        @* Booking (white text) *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white-menu" href="#" id="roomsDropdown2" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-calendar-check me-1"></i> Booking
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="roomsDropdown2">
+                                <li><NavLink class="dropdown-item" href="room-scheduler">New Booking</NavLink></li>
+                                <li><NavLink class="dropdown-item" href="booking-details">View All Bookings</NavLink></li>
+                            </ul>
                         </li>
 
-                        @* Reports *@
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="misreport">
-                                <i class="bi bi-file-earmark-text me-1"></i> Report
-                            </NavLink>
+                        @* Calendar (white text) *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white-menu" href="#" id="roomsDropdown3" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-calendar-event me-1"></i> Calendar
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="roomsDropdown3">
+                                <li><NavLink class="dropdown-item" href="calendar">View Calendar</NavLink></li>
+                            </ul>
                         </li>
+
+                        @* Approvals (white text) *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white-menu" href="#" id="roomsDropdown4" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-check-circle me-1"></i> Approvals
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="roomsDropdown4">
+                                <li><NavLink class="dropdown-item" href="approvals">Pending Approvals</NavLink></li>
+                            </ul>
+                        </li>
+
+                        @* Reports (white text) *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white-menu" href="#" id="roomsDropdown5" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bar-chart me-1"></i> Reports
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="roomsDropdown5">
+                                <li><NavLink class="dropdown-item" href="misreport">MIS Reports</NavLink></li>
+                            </ul>
+                        </li>
+
                     </ul>
+
+                    @* <!-- Right-side menu -->
+                    <div class="d-flex align-items-center ms-auto gap-2">
+
+                        <!-- Search button -->
+                        <button class="btn btn-dark btn-sm rounded-circle">
+                            <i class="bi bi-search"></i>
+                        </button>
+
+                        <!-- Help button -->
+                        <button class="btn btn-dark btn-sm rounded-circle">
+                            <i class="bi bi-question-circle"></i>
+                        </button>
+
+                        <!-- Notification button -->
+                        <button class="btn btn-dark btn-sm rounded-circle position-relative">
+                            <i class="bi bi-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                        </button>
+
+                        <!-- User info -->
+                        <div class="dropdown">
+                            <button class="btn btn-dark btn-sm d-flex align-items-center gap-1" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="" alt="User" class="rounded-circle" style="height:28px;width:28px;" />
+                                <span class="text-white">John Smith</span>
+                                <i class="bi bi-caret-down-fill text-white"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><NavLink class="dropdown-item" href="#">Profile</NavLink></li>
+                                <li><NavLink class="dropdown-item" href="#">Settings</NavLink></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><NavLink class="dropdown-item" href="#">Logout</NavLink></li>
+                            </ul>
+                        </div>
+
+                    </div> *@
+
                 </div>
             </div>
         </nav>
 
         <!-- 🔹 Styles -->
         <style>
+            /* Navbar background */
             .bg-custom {
                 background-color: #0D2360 !important;
             }
@@ -100,7 +150,7 @@
                 transition: all 0.3s ease;
             }
 
-            /* Hover effect */
+            /* NavLink hover effect */
             .nav-link {
                 position: relative;
                 transition: color 0.2s;
@@ -110,19 +160,111 @@
                 color: #F68E1E !important;
             }
 
-            /* Navbar tweaks */
+            /* Navbar items spacing */
             .navbar-nav .nav-item {
-                margin-right: 10px;
+                margin-right: 8px;
             }
 
-            .navbar-brand {
-                font-size: 1.5rem;
-            }
-
+            /* Navbar toggler */
             .navbar-toggler {
                 border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 4px;
             }
+
+            /* Dropdown menu styling */
+            .dropdown-menu {
+                background-color: #ffffff;
+                border: none;
+                border-radius: 4px;
+                box-shadow: 0px 3px 6px rgba(0,0,0,0.15);
+            }
+
+            /* Dropdown items */
+            .dropdown-item {
+                color: #0D2360;
+                font-weight: 500;
+                border-radius: 4px;
+            }
+
+            .dropdown-item:hover,
+            .dropdown-item.active {
+                background-color: #e0e0e0;
+                border-radius: 4px;
+                color: #0D2360;
+            }
+
+            /* ===== Compact Navbar ===== */
+            .navbar {
+                padding-top: 0.15rem !important;
+                padding-bottom: 0.15rem !important;
+                min-height: 40px !important;
+            }
+
+            /* Reduce nav-link padding inside navbar */
+            .navbar .nav-link {
+                padding-top: 0.1rem !important;
+                padding-bottom: 0.1rem !important;
+                font-size: 0.9rem;
+            }
+
+            /* Brand/logo size */
+            .navbar-brand img {
+                height: 32px;
+            }
+
+            /* Dropdown font size */
+            .dropdown-menu .dropdown-item {
+                font-size: 0.875rem;
+            }
+
+            /* Adjust spacing for navbar-collapse */
+            .navbar-collapse {
+                gap: 0.25rem;
+            }
+
+            /* White text for all main menu items */
+            .text-white-menu {
+                color: #ffffff !important;
+            }
+
+            .text-white-menu:hover {
+                color: #F68E1E !important;
+            }
+            .navbar-nav .nav-item {
+                margin-right: 1px;
+            }
+            /* Right-side navbar buttons */
+            .navbar .btn-dark {
+                background-color: #1a1a1a;
+                color: #fff;
+                border: none;
+                padding: 0.3rem 0.4rem;
+            }
+
+            .navbar .btn-dark:hover {
+                background-color: #F68E1E;
+                color: #fff;
+            }
+
+            /* Notification red dot */
+            .position-relative .bg-danger {
+                width: 8px;
+                height: 8px;
+            }
+            .navbar .dropdown-menu {
+                border: 1px solid #0D2360;
+            }
+            .dropdown-item {
+                color: #0D2360;
+                font-weight: 500;
+                border-radius: 4px;
+            }
+            /* Footer styling */
+                .footer {
+                    width: 100%;
+                    border-top: 2px solid #F68E1E; /* Same highlight as navbar underline */
+                    font-size: 0.85rem;
+                }
         </style>
 
         <!-- 🔹 Page Content -->
@@ -130,4 +272,8 @@
             @Body
         </article>
     </main>
+    @* <!-- 🔹 Footer -->
+    <footer class="footer bg-custom text-white text-center py-2 mt-auto">
+        <small>Powered by Integra</small>
+    </footer> *@
 </div>

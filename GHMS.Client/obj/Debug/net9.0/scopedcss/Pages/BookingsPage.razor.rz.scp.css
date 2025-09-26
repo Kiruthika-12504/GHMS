@@ -1,0 +1,68 @@
+.page-title[b-q800e3vtn7] {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+ 
+.loading-text[b-q800e3vtn7],
+.empty-text[b-q800e3vtn7] {
+    font-size: 1rem;
+    color: #666;
+    text-align: center;
+    margin-top: 40px;
+}
+ 
+.booking-grid[b-q800e3vtn7] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+ 
+.booking-card[b-q800e3vtn7] {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 16px 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+ 
+.booking-card:hover[b-q800e3vtn7] {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+ 
+.card-header[b-q800e3vtn7] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+ 
+.booking-id[b-q800e3vtn7] {
+    font-weight: 600;
+    color: #555;
+}
+ 
+.booking-type[b-q800e3vtn7] {
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: white;
+}
+ 
+.type-confirm[b-q800e3vtn7] { background-color: #28a745; } /* Green */
+.type-tentative[b-q800e3vtn7] { background-color: #ffc107; } /* Yellow */
+.type-block[b-q800e3vtn7] { background-color: #ff5722; } /* Orange */
+.type-default[b-q800e3vtn7] { background-color: #6c757d; } /* Grey */
+ 
+.card-body p[b-q800e3vtn7] {
+    margin: 4px 0;
+    font-size: 0.9rem;
+    color: #444;
+}
+ 
+.card-body strong[b-q800e3vtn7] {
+    color: #333;
+}

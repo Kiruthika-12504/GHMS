@@ -9,3 +9,15 @@ C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.dll
 C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\refint\GHMS.Shared.dll
 C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.pdb
 C:\Users\IS12504\Downloads\GHMS\GHMS.Shared\obj\Debug\net9.0\ref\GHMS.Shared.dll
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\bin\Debug\net9.0\GHMS.Shared.deps.json
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\bin\Debug\net9.0\GHMS.Shared.dll
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\bin\Debug\net9.0\GHMS.Shared.pdb
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.AssemblyInfoInputs.cache
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.AssemblyInfo.cs
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.csproj.CoreCompileInputs.cache
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.sourcelink.json
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.dll
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\refint\GHMS.Shared.dll
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\GHMS.Shared.pdb
+C:\Users\is12505\Downloads\GHMS_Master\GHMS.Shared\obj\Debug\net9.0\ref\GHMS.Shared.dll

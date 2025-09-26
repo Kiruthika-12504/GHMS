@@ -13,65 +13,69 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = GHMS
 build_property.RootNamespace = GHMS
-build_property.ProjectDir = C:\Users\IS12504\Downloads\GHMS\GHMS.Client\
+build_property.ProjectDir = C:\Users\is12505\Downloads\GHMS_Master\GHMS.Client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\IS12504\Downloads\GHMS\GHMS.Client
+build_property.MSBuildProjectDirectory = C:\Users\is12505\Downloads\GHMS_Master\GHMS.Client
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/App.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/Add_NewRoom.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/Add_NewRoom.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRkX05ld1Jvb20ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/BookingHistory.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/BookingHistory.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQm9va2luZ0hpc3RvcnkucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/BookingScheduler.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/BookingScheduler.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQm9va2luZ1NjaGVkdWxlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/BookingsPage.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQm9va2luZ3NQYWdlLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/Dashboard.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/Dashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/Report.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/Report.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/RoomBooking.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/RoomBooking.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUm9vbUJvb2tpbmcucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/Rooms.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/Rooms.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUm9vbXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/TravelDesk.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/RoomStaus.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUm9vbVN0YXVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/TravelDesk.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhdmVsRGVzay5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/_Imports.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Layout/MainLayout.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-839pli1v0i
 
-[C:/Users/IS12504/Downloads/GHMS/GHMS.Client/Pages/Login.razor]
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/BookingsPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQm9va2luZ3NQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-q800e3vtn7
+
+[C:/Users/is12505/Downloads/GHMS_Master/GHMS.Client/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-m8m5zw1lvg

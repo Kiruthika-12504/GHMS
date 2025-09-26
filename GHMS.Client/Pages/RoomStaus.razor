@@ -1,0 +1,173 @@
+@page "/roomstatus"
+
+<PageTitle>Room Status</PageTitle>
+
+<div class="container mt-4">
+    <h3>Room Status</h3>
+
+    <!-- Top Filters -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Location Dropdown -->
+        <select class="form-select w-auto" @bind="SelectedLocation">
+            @foreach (var location in Locations)
+            {
+                <option value="@location">@location</option>
+            }
+        </select>
+
+        <!-- Date Picker -->
+        <input type="date" class="form-control w-auto" @bind="SelectedDate" />
+    </div>
+
+    <!-- Sections for each status -->
+    @foreach (var status in StatusCategories)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>@status Rooms</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var room in GetRoomsByStatus(status))
+                    {
+                        <div class="col-md-3 mb-3">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6>@room.RoomNo</h6>
+                                            <p class="mb-1">Type: @room.RoomType</p>
+                                            <span class="badge @(GetBadgeClass(room.Status))">@room.Status</span>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-info" title="View Details" @onclick="() => ShowRoomDetails(room)">
+                                            <span class="bi bi-info-circle"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Room Details Modal -->
+@if (SelectedRoom != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Room Details - @SelectedRoom.RoomNo</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDetails"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Room Type:</strong> @SelectedRoom.RoomType</p>
+                    <p><strong>Status:</strong> @SelectedRoom.Status</p>
+                    <p><strong>Location:</strong> @SelectedLocation</p>
+                    <p><strong>Date:</strong> @SelectedDate.ToString("dd MMM yyyy")</p>
+                    <p><strong>Description:</strong> Detailed room information goes here. You can extend this with guest name, check-in/out time, remarks, etc.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseDetails">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Locations
+    private List<string> Locations = new() { "Pondicherry", "Chennai", "Tirchy" };
+    private string SelectedLocation { get; set; } = "Pondicherry";
+
+    // Date Picker
+    private DateTime SelectedDate { get; set; } = DateTime.Today;
+
+    // Status categories
+    private List<string> StatusCategories = new() { "Available", "Tentative", "Occupied", "Maintenance", "Cleaning", "Blocked" };
+
+    // Master room list
+    private List<Room> AllRooms = new()
+    {
+        new Room { RoomNo = "Room No 1", RoomType = "Single" },
+        new Room { RoomNo = "Room No 2", RoomType = "Single" },
+        new Room { RoomNo = "Room No 3", RoomType = "Single" },
+        new Room { RoomNo = "Room No 4", RoomType = "Double" },
+        new Room { RoomNo = "Room No 5", RoomType = "Double" },
+        new Room { RoomNo = "Room No 6", RoomType = "Single" },
+        new Room { RoomNo = "Room No 7", RoomType = "Single" },
+        new Room { RoomNo = "Room No 8", RoomType = "Single" },
+        new Room { RoomNo = "Room No 9", RoomType = "Single" },
+        new Room { RoomNo = "Room No 10", RoomType = "Single" },
+        new Room { RoomNo = "Room No 11", RoomType = "Single" },
+        new Room { RoomNo = "Room No 12", RoomType = "Single" },
+        new Room { RoomNo = "Room No 13", RoomType = "Single" },
+        new Room { RoomNo = "Room No 14", RoomType = "Single" },
+        new Room { RoomNo = "Room No 15", RoomType = "Single" },
+        new Room { RoomNo = "Room No 16", RoomType = "Single" },
+        new Room { RoomNo = "Room No 17", RoomType = "Single" }
+    };
+
+    // Status history per location + date
+    private Dictionary<(DateTime, string), List<Room>> RoomStatusHistory = new();
+
+    private Room? SelectedRoom;
+
+    protected override void OnInitialized()
+    {
+        LoadStatusForDay(SelectedDate, SelectedLocation);
+    }
+
+    private IEnumerable<Room> GetRoomsByStatus(string status)
+    {
+        var key = (SelectedDate.Date, SelectedLocation);
+        if (RoomStatusHistory.TryGetValue(key, out var rooms))
+        {
+            return rooms.Where(r => r.Status == status);
+        }
+        return Enumerable.Empty<Room>();
+    }
+
+    private string GetBadgeClass(string status) => status switch
+    {
+        "Available" => "bg-success",
+        "Occupied" => "bg-danger",
+        "Tentative" => "bg-info text-dark",
+        "Cleaning" => "bg-primary",
+        "Maintenance" => "bg-warning text-dark",
+        "Blocked" => "bg-secondary",
+        _ => "bg-light"
+    };
+
+    private void ShowRoomDetails(Room room) => SelectedRoom = room;
+
+    private void CloseDetails() => SelectedRoom = null;
+
+    private void LoadStatusForDay(DateTime date, string location)
+    {
+        var key = (date.Date, location);
+        if (!RoomStatusHistory.ContainsKey(key))
+        {
+            var random = new Random();
+            var statuses = StatusCategories;
+            var rooms = AllRooms.Select(r => new Room
+            {
+                RoomNo = r.RoomNo,
+                RoomType = r.RoomType,
+                Status = statuses[random.Next(statuses.Count)]
+            }).ToList();
+
+            RoomStatusHistory[key] = rooms;
+        }
+    }
+
+    public class Room
+    {
+        public string RoomNo { get; set; } = "";
+        public string RoomType { get; set; } = "";
+        public string Status { get; set; } = "Available";
+    }
+}

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GHMS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e3d701428fd578267010cd1a1dab972afb06ba7c")]
 [assembly: System.Reflection.AssemblyProductAttribute("GHMS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GHMS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

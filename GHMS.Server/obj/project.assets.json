@@ -741,19 +741,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\IS12504\\.nuget\\packages\\": {}
+    "C:\\Users\\is12505\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Server\\GHMS.Server.csproj",
+      "projectUniqueName": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Server\\GHMS.Server.csproj",
       "projectName": "GHMS.Server",
-      "projectPath": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Server\\GHMS.Server.csproj",
-      "packagesPath": "C:\\Users\\IS12504\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Server\\obj\\",
+      "projectPath": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Server\\GHMS.Server.csproj",
+      "packagesPath": "C:\\Users\\is12505\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Server\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\IS12504\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\is12505\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -766,8 +766,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Shared\\GHMS.Shared.csproj": {
-              "projectPath": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Shared\\GHMS.Shared.csproj"
+            "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Shared\\GHMS.Shared.csproj": {
+              "projectPath": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Shared\\GHMS.Shared.csproj"
             }
           }
         }

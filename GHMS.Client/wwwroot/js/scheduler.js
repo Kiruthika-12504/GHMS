@@ -49,11 +49,11 @@ if (!document.getElementById('scheduler-styles')) {
     `;
     document.head.appendChild(style);
 }
-
+ 
 window.initScheduler = function (selectedRoom = "All") {
     var bookings = JSON.parse(localStorage.getItem("roomBookings")) || [];
     var guestHouses = JSON.parse(localStorage.getItem("guestHouses")) || [];
-
+ 
     var roomResources = guestHouses.map(gh => ({
         text: gh.GuestName,
         id: gh.RoomId,
@@ -61,7 +61,7 @@ window.initScheduler = function (selectedRoom = "All") {
         GuestName: gh.GuestName,
         color: '#' + Math.floor(Math.random() * 16777215).toString(16)
     }));
-
+ 
     var resources = [{
         field: 'RoomId',
         title: 'Room',
@@ -74,20 +74,20 @@ window.initScheduler = function (selectedRoom = "All") {
         idField: 'id',
         colorField: 'color'
     }];
-
+ 
     var dataSource = selectedRoom === "All"
         ? bookings
         : bookings.filter(b => b.RoomId == selectedRoom);
-
+ 
     if (window.schedulerObj) window.schedulerObj.destroy();
-
+ 
     // ---------------- Custom Editor Template ----------------
     var customEditorTemplate = function () {
         return `
         <div class="custom-editor" style="padding: 0; margin: 0;">
             <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 24px 20px 12px 20px; max-width: 600px; margin: auto;">
                 <input type="hidden" name="RoomId" />
-
+ 
                 <!-- Booking Type -->
                 <div style="margin-bottom: 16px;">
                     <label style="font-weight: 500;">Booking Type</label>
@@ -98,7 +98,7 @@ window.initScheduler = function (selectedRoom = "All") {
                         <option>Block Room</option>
                     </select>
                 </div>
-
+ 
                 <!-- Usual Fields -->
                 <div class="usual-fields">
                     <div style="display: flex; gap: 16px; margin-bottom: 16px;">
@@ -152,7 +152,7 @@ window.initScheduler = function (selectedRoom = "All") {
                         </div>
                     </div>
                 </div>
-
+ 
                 <!-- Check In / Check Out / Remarks (always visible) -->
                 <div style="display: flex; gap: 16px; margin-bottom: 16px;">
                     <div style="flex: 1;">
@@ -172,7 +172,7 @@ window.initScheduler = function (selectedRoom = "All") {
         </div>
         `;
     };
-
+ 
     // ---------------- Initialize the Scheduler ----------------
     window.schedulerObj = new ej.schedule.Schedule({
         height: '600px',
@@ -195,25 +195,25 @@ window.initScheduler = function (selectedRoom = "All") {
         showQuickInfo: false,
         showHeaderBar: false,
         editorTemplate: customEditorTemplate,
-
+ 
         // ---------------- Popup Open Logic ----------------
         popupOpen: function (args) {
             if (args.type === "QuickInfo") args.cancel = true;
-
+ 
             if (args.type === "Editor") {
                 if (args.data && !args.data.Id) {
                     var start = args.data.StartTime ? new Date(args.data.StartTime) : new Date();
                     var end = args.data.EndTime ? new Date(args.data.EndTime) : new Date(start.getTime() + 30 * 60000);
-
+ 
                     function formatLocalDateTime(date) {
                         const pad = n => n.toString().padStart(2, "0");
                         return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + "T" + pad(date.getHours()) + ":" + pad(date.getMinutes());
                     }
-
+ 
                     setTimeout(() => {
                         document.querySelector("input[name='CheckIn']").value = formatLocalDateTime(start);
                         document.querySelector("input[name='CheckOut']").value = formatLocalDateTime(end);
-
+ 
                         const roomIdInput = document.querySelector("input[name='RoomId']");
                         if (roomIdInput) {
                             roomIdInput.value = args.data.resourceIds && args.data.resourceIds.length > 0
@@ -222,52 +222,52 @@ window.initScheduler = function (selectedRoom = "All") {
                         }
                     }, 50);
                 }
-
+ 
                 // Toggle usual fields based on Booking Type
                 var bookingTypeSelect = document.querySelector("select[name='BookingType']");
                 var usualFields = document.querySelector(".usual-fields");
-
+ 
                 function toggleFields() {
                     if (bookingTypeSelect.value === "Block Room") usualFields.style.display = "none";
                     else usualFields.style.display = "block";
                 }
-
+ 
                 bookingTypeSelect.addEventListener("change", toggleFields);
                 toggleFields();
             }
         },
-
+ 
         actionBegin: function (args) {
     var bookings = JSON.parse(localStorage.getItem("roomBookings")) || [];
     var guestHouses = JSON.parse(localStorage.getItem("guestHouses")) || [];
-
+ 
     if (args.requestType === "eventCreate") {
         var newBooking = Array.isArray(args.data) ? args.data[0] : args.data;
         if (!newBooking) { args.cancel = true; return; }
-
+ 
         // ---------------- Validate Booking Type ----------------
         if (!newBooking.BookingType || newBooking.BookingType.trim() === "") {
             alert("⚠️ Please select a Booking Type!");
             args.cancel = true;
             return;
         }
-
+ 
         // ---------------- Prevent saving "Block Room" ----------------
         if (newBooking.BookingType === "Block Room") {
             alert("⚠️ 'Block Room' bookings cannot be saved!");
             args.cancel = true;  // cancel creation
             return;
         }
-
+ 
         var selectedRoomId = args.data.resourceIds?.[0] || (selectedRoom !== "All" ? selectedRoom : guestHouses[0]?.RoomId);
         var roomDetails = guestHouses.find(gh => gh.RoomId == selectedRoomId);
         if (!roomDetails) { alert("⚠️ Selected room does not exist!"); args.cancel = true; return; }
-
+ 
         var checkIn = new Date(newBooking.CheckIn || newBooking.StartTime);
         var checkOut = new Date(newBooking.CheckOut || newBooking.EndTime);
-
+ 
         if (checkIn < new Date()) { alert("⛔ Bookings cannot be created in the past!"); args.cancel = true; return; }
-
+ 
         // ---------------- Conflict Check ----------------
         var conflict = bookings.some(b =>
             b.RoomId === roomDetails.RoomId &&
@@ -276,7 +276,7 @@ window.initScheduler = function (selectedRoom = "All") {
              (checkIn <= new Date(b.CheckIn || b.StartTime) && checkOut >= new Date(b.CheckOut || b.EndTime)))
         );
         if (conflict) { alert("⚠️ This room is already booked during the selected time!"); args.cancel = true; return; }
-
+ 
         // ---------------- Store Booking ----------------
         newBooking.Id = newBooking.Id || Date.now();
         newBooking.RoomId = selectedRoomId;
@@ -288,21 +288,21 @@ window.initScheduler = function (selectedRoom = "All") {
         newBooking.StartTime = newBooking.CheckIn;
         newBooking.EndTime = newBooking.CheckOut;
         newBooking.Subject = newBooking.Subject || "Booked";
-
+ 
         bookings.push(newBooking);
         localStorage.setItem("roomBookings", JSON.stringify(bookings));
     }
-
+ 
     if (args.requestType === "eventChange") {
         var data = Array.isArray(args.data) ? args.data[0] : args.data;
         if (!data) return;
         if (new Date(data.StartTime) < new Date()) { alert("⛔ Bookings cannot be moved to the past!"); args.cancel = true; }
     }
 }
-
+ 
     });
     window.schedulerObj.appendTo('#Scheduler');
-
+ 
     // ---------------- Custom Header ----------------
     var schedulerContainer = document.getElementById('Scheduler');
     var headerDiv = document.createElement('div');
@@ -329,7 +329,7 @@ window.initScheduler = function (selectedRoom = "All") {
     </div>
     `;
     schedulerContainer.prepend(headerDiv);
-
+ 
     // ---------------- Date Range ----------------
     function updateDateRange() {
         var start = new Date(window.schedulerObj.selectedDate);
@@ -343,7 +343,7 @@ window.initScheduler = function (selectedRoom = "All") {
         document.getElementById('dateRange').innerText = `${start.toDateString()} - ${end.toDateString()}`;
     }
     updateDateRange();
-
+ 
     // ---------------- Navigation ----------------
     document.getElementById('prevBtn').onclick = () => {
         window.schedulerObj.selectedDate = new Date(window.schedulerObj.selectedDate.setDate(window.schedulerObj.selectedDate.getDate() - 1));
@@ -353,7 +353,7 @@ window.initScheduler = function (selectedRoom = "All") {
         window.schedulerObj.selectedDate = new Date(window.schedulerObj.selectedDate.setDate(window.schedulerObj.selectedDate.getDate() + 1));
         updateDateRange();
     };
-
+ 
     // ---------------- View Buttons ----------------
     document.getElementById('dayBtn').onclick = () => { window.schedulerObj.currentView = 'Day'; updateDateRange(); };
     document.getElementById('weekBtn').onclick = () => { window.schedulerObj.currentView = 'Week'; updateDateRange(); };
@@ -361,7 +361,7 @@ window.initScheduler = function (selectedRoom = "All") {
     document.getElementById('timelineDayBtn').onclick = () => { window.schedulerObj.currentView = 'TimelineDay'; updateDateRange(); };
     document.getElementById('timelineWeekBtn').onclick = () => { window.schedulerObj.currentView = 'TimelineWeek'; updateDateRange(); };
     document.getElementById('timelineMonthBtn').onclick = () => { window.schedulerObj.currentView = 'TimelineMonth'; updateDateRange(); };
-
+ 
     // ---------------- Room Filter ----------------
     var roomFilter = document.getElementById('roomFilter');
     roomFilter.value = selectedRoom;

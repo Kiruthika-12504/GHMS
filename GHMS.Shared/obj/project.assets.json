@@ -8,19 +8,19 @@
     "net9.0": []
   },
   "packageFolders": {
-    "C:\\Users\\IS12504\\.nuget\\packages\\": {}
+    "C:\\Users\\is12505\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Shared\\GHMS.Shared.csproj",
+      "projectUniqueName": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Shared\\GHMS.Shared.csproj",
       "projectName": "GHMS.Shared",
-      "projectPath": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Shared\\GHMS.Shared.csproj",
-      "packagesPath": "C:\\Users\\IS12504\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\IS12504\\Downloads\\GHMS\\GHMS.Shared\\obj\\",
+      "projectPath": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Shared\\GHMS.Shared.csproj",
+      "packagesPath": "C:\\Users\\is12505\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\is12505\\Downloads\\GHMS_Master\\GHMS.Shared\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\IS12504\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\is12505\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
