@@ -2,56 +2,66 @@
 @inject IJSRuntime JS
 @using GHMS.Layout
 @layout MainLayout
- 
+
 <PageTitle>Add New Guest House</PageTitle>
- 
-<div class="container py-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Add New Guest House</h5>
+
+<div class="container py-5">
+    <!-- Add Guest House Card -->
+    <div class="card shadow-lg rounded-4 mb-5 border-0">
+        <div class="card-header bg-gradient-primary text-white rounded-top-4">
+            <h4 class="mb-0">Add New Guest House</h4>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
             <EditForm Model="@newGuestHouse" OnValidSubmit="@HandleValidSubmit">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
- 
+
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Guest House Name</label>
-                        <InputText class="form-control" @bind-Value="newGuestHouse.GuestName" />
+                        <label class="form-label fw-semibold">Guest House Name</label>
+                        <InputText class="form-control shadow-sm rounded-3" @bind-Value="newGuestHouse.GuestName" placeholder="Enter guest house name"/>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Location</label>
-                        <InputText class="form-control" @bind-Value="newGuestHouse.Location" />
+                        <label class="form-label fw-semibold">Location</label>
+                        <InputText class="form-control shadow-sm rounded-3" @bind-Value="newGuestHouse.Location" placeholder="City or area"/>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Max Occupancy</label>
-                        <InputNumber class="form-control" @bind-Value="newGuestHouse.MaxOccupancy" />
+                        <label class="form-label fw-semibold">Max Occupancy</label>
+                        <InputNumber class="form-control shadow-sm rounded-3" @bind-Value="newGuestHouse.MaxOccupancy" placeholder="Number of guests"/>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Floor Number</label>
-                        <InputNumber class="form-control" @bind-Value="newGuestHouse.FloorNumber" />
+                        <label class="form-label fw-semibold">Floor Number</label>
+                        <InputNumber class="form-control shadow-sm rounded-3" @bind-Value="newGuestHouse.FloorNumber" placeholder="Floor number"/>
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Amenities (comma separated)</label>
-                        <InputText class="form-control" @bind-Value="newGuestHouse.Amenities" />
+                        <label class="form-label fw-semibold">Amenities (comma separated)</label>
+                        <InputText class="form-control shadow-sm rounded-3" @bind-Value="newGuestHouse.Amenities" placeholder="WiFi, Pool, Parking..."/>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Upload Image</label>
+                        <InputFile OnChange="HandleImageUpload" class="form-control shadow-sm rounded-3"/>
+                        @if (!string.IsNullOrEmpty(newGuestHouse.ImageData))
+                        {
+                            <img src="@newGuestHouse.ImageData" alt="Guest House Image" class="img-fluid rounded-3 mt-2" style="max-height:150px;"/>
+                        }
                     </div>
                 </div>
- 
+
                 <div class="mt-4 text-end">
-                    <button type="submit" class="btn btn-success me-2">Add Guest House</button>
-                    <button type="button" class="btn btn-secondary" @onclick="ResetForm">Reset</button>
+                    <button type="submit" class="btn btn-success me-2 shadow-sm">Add Guest House</button>
+                    <button type="button" class="btn btn-outline-secondary shadow-sm" @onclick="ResetForm">Reset</button>
                 </div>
             </EditForm>
         </div>
     </div>
- 
-    <div class="card shadow-sm mt-4">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Guest Houses List</h5>
+
+    <!-- Guest Houses List -->
+    <div class="card shadow-lg rounded-4 border-0">
+        <div class="card-header bg-dark text-white rounded-top-4">
+            <h4 class="mb-0">Guest Houses List</h4>
         </div>
-        <div class="card-body">
-            <table class="table table-striped table-hover">
+        <div class="card-body p-4">
+            <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>Room Id</th>
@@ -60,6 +70,7 @@
                         <th>Max Occupancy</th>
                         <th>Floor</th>
                         <th>Amenities</th>
+                        <th>Image</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -69,13 +80,19 @@
                         <tr>
                             @if (editId == gh.Id)
                             {
-                                <!-- Editable Row -->
                                 <td>@gh.RoomId</td>
                                 <td><InputText class="form-control" @bind-Value="gh.GuestName" /></td>
                                 <td><InputText class="form-control" @bind-Value="gh.Location" /></td>
                                 <td><InputNumber class="form-control" @bind-Value="gh.MaxOccupancy" /></td>
                                 <td><InputNumber class="form-control" @bind-Value="gh.FloorNumber" /></td>
                                 <td><InputText class="form-control" @bind-Value="gh.Amenities" /></td>
+                                <td>
+                                    <InputFile OnChange="@(e => HandleEditImageUpload(e, gh))" class="form-control"/>
+                                    @if (!string.IsNullOrEmpty(gh.ImageData))
+                                    {
+                                        <img src="@gh.ImageData" class="img-fluid rounded-2 mt-1" style="max-height:80px;"/>
+                                    }
+                                </td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-success me-2" @onclick="@(() => SaveEdit(gh.Id))">Save</button>
                                     <button class="btn btn-sm btn-secondary" @onclick="CancelEdit">Cancel</button>
@@ -83,13 +100,18 @@
                             }
                             else
                             {
-                                <!-- Normal Row -->
                                 <td>@gh.RoomId</td>
                                 <td>@gh.GuestName</td>
                                 <td>@gh.Location</td>
                                 <td>@gh.MaxOccupancy</td>
                                 <td>@gh.FloorNumber</td>
                                 <td>@gh.Amenities</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(gh.ImageData))
+                                    {
+                                        <img src="@gh.ImageData" class="img-fluid rounded-2" style="max-height:80px;"/>
+                                    }
+                                </td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-primary me-2" @onclick="@(() => EditRow(gh.Id))">Edit</button>
                                     <button class="btn btn-sm btn-danger" @onclick="@(() => DeleteRow(gh.Id))">Delete</button>
@@ -102,32 +124,30 @@
         </div>
     </div>
 </div>
- 
+
 @code {
     private GuestHouse newGuestHouse = new GuestHouse();
     private List<GuestHouse> guestHouses = new List<GuestHouse>();
     private const string storageKey = "guestHouses";
     private Guid? editId = null;
-    private int roomCounter = 1; // keeps track of last room ID
- 
+    private int roomCounter = 1;
+
     protected override async Task OnInitializedAsync()
     {
         var data = await JS.InvokeAsync<string>("localStorage.getItem", storageKey);
         if (!string.IsNullOrEmpty(data))
         {
             guestHouses = System.Text.Json.JsonSerializer.Deserialize<List<GuestHouse>>(data) ?? new List<GuestHouse>();
- 
-            // continue room counter from last saved
             if (guestHouses.Any())
                 roomCounter = guestHouses.Max(g => g.RoomId) + 1;
         }
     }
- 
+
     private async Task HandleValidSubmit()
     {
         newGuestHouse.Id = Guid.NewGuid();
-        newGuestHouse.RoomId = roomCounter++; // auto-generate
- 
+        newGuestHouse.RoomId = roomCounter++;
+
         guestHouses.Add(new GuestHouse
         {
             Id = newGuestHouse.Id,
@@ -136,25 +156,26 @@
             Location = newGuestHouse.Location,
             MaxOccupancy = newGuestHouse.MaxOccupancy,
             FloorNumber = newGuestHouse.FloorNumber,
-            Amenities = newGuestHouse.Amenities
+            Amenities = newGuestHouse.Amenities,
+            ImageData = newGuestHouse.ImageData
         });
- 
+
         await SaveToStorage();
         newGuestHouse = new GuestHouse();
     }
- 
+
     private void ResetForm() => newGuestHouse = new GuestHouse();
- 
+
     private void EditRow(Guid id) => editId = id;
- 
+
     private async Task SaveEdit(Guid id)
     {
         editId = null;
         await SaveToStorage();
     }
- 
+
     private void CancelEdit() => editId = null;
- 
+
     private async Task DeleteRow(Guid id)
     {
         var gh = guestHouses.FirstOrDefault(x => x.Id == id);
@@ -164,21 +185,38 @@
             await SaveToStorage();
         }
     }
- 
+
     private async Task SaveToStorage()
     {
         var json = System.Text.Json.JsonSerializer.Serialize(guestHouses);
         await JS.InvokeVoidAsync("localStorage.setItem", storageKey, json);
     }
- 
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffer);
+        newGuestHouse.ImageData = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+
+    private async Task HandleEditImageUpload(InputFileChangeEventArgs e, GuestHouse gh)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffer);
+        gh.ImageData = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+
     public class GuestHouse
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public int RoomId { get; set; }   // Auto-generated
+        public int RoomId { get; set; }
         public string GuestName { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public int MaxOccupancy { get; set; }
         public int FloorNumber { get; set; }
         public string Amenities { get; set; } = string.Empty;
+        public string ImageData { get; set; } = string.Empty; // Base64 image
     }
 }
