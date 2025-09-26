@@ -6,9 +6,10 @@
 <PageTitle>MIS Report</PageTitle>
 
 <div class="toolbar mb-3 d-flex flex-wrap align-items-center gap-2">
+
     <!-- Period selection -->
     <div class="d-flex gap-2 align-items-center">
-        <select class="form-select" style="width:180px;" @onchange="PeriodChanged">
+        <select class="form-select" style="width:150px;" @onchange="PeriodChanged">
             <option value="All">All</option>
             <option value="Month">This Month</option>
             <option value="Year">This Year</option>
@@ -17,13 +18,13 @@
 
         @if (IsCustomRange)
         {
-            <InputDate @bind-Value="CustomStart" class="form-control" style="width:150px;" />
-            <InputDate @bind-Value="CustomEnd" class="form-control" style="width:150px;" />
+            <InputDate @bind-Value="CustomStart" class="form-control" style="width:120px;" />
+            <InputDate @bind-Value="CustomEnd" class="form-control" style="width:120px;" />
             <button class="btn btn-outline-primary" @onclick="ApplyCustomRange">Apply</button>
         }
         else if (IsMonthYearFilter)
         {
-            <select class="form-select" style="width:160px;" @bind="SelectedMonth">
+            <select class="form-select" style="width:140px;" @bind="SelectedMonth">
                 @for (int m = 1; m <= 12; m++)
                 {
                     <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
@@ -39,21 +40,24 @@
         }
     </div>
 
-    <!-- Search -->
-    <div class="d-flex gap-2 align-items-center flex-grow-1">
-        <input class="form-control" placeholder="Search Room, Guest, BookedBy" @bind="SearchText" @bind:event="oninput" />
-        <button class="btn btn-outline-primary" @onclick="ApplySearch">Search</button>
-    </div>
+<!-- Search and Actions (inline with export buttons) -->
+<div class="d-flex gap-2 align-items-center flex-grow-1">
+    <input class="form-control flex-grow-1" placeholder="Search Room, Guest, BookedBy" @bind="SearchText" @bind:event="oninput" style="min-width:300px;" />
+    <button class="btn btn-outline-primary" @onclick="ApplySearch">Search</button>
+    <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear Filters</button>
 
-    <!-- Actions -->
-    <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear Filters</button>
-    </div>
+    <!-- Export buttons inline -->
+    <button class="btn btn-success" @onclick="ExportExcelClient">Export Excel</button>
+    <button class="btn btn-danger" @onclick="ExportPdfClient">Export PDF</button>
+</div>
+
+
 </div>
 
 @if (FilteredBookings.Any())
 {
-    <SfGrid DataSource="@FilteredBookings" AllowPaging="true" AllowSorting="true" AllowFiltering="true">
+    <SfGrid @ref="Grid" DataSource="@FilteredBookings" AllowPaging="true" AllowSorting="true" AllowFiltering="true">
+
         <GridPageSettings PageSize="10"></GridPageSettings>
         <GridColumns>
             <GridColumn Field="BookingId" HeaderText="Booking ID" Width="100" TextAlign="TextAlign.Center"></GridColumn>
@@ -63,14 +67,13 @@
             <GridColumn Field="GuestEmail" HeaderText="Guest Email" Width="220"></GridColumn>
             <GridColumn Field="StayedGuestCount" HeaderText="Stayed Guests" Width="150" TextAlign="TextAlign.Center"></GridColumn>
             <GridColumn Field="DurationOfStay" HeaderText="Duration (Days)" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+            <!-- ✅ Add these two new columns -->
+            <GridColumn Field="CheckIn" HeaderText="Check In" Width="150" Format="dd-MM-yyyy" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="CheckOut" HeaderText="Check Out" Width="150" Format="dd-MM-yyyy" TextAlign="TextAlign.Center"></GridColumn>
             <GridColumn Field="BookedBy" HeaderText="Booked By" Width="120"></GridColumn>
         </GridColumns>
     </SfGrid>
 
-    <div class="mt-3 d-flex gap-2">
-        <button class="btn btn-success" @onclick="ExportExcelClient">Export to Excel</button>
-        <button class="btn btn-danger" @onclick="ExportPdfClient">Export to PDF</button>
-    </div>
 }
 else
 {
@@ -105,10 +108,26 @@ else
     {
         // sample data
         Bookings = new List<Booking>
-        {
-            new Booking { BookingId=1, RoomNo="101", RoomType="Single", GuestName="John Doe", GuestEmail="john@mail.com", StayedGuestCount=1, DurationOfStay=3, BookedBy="HR", CheckIn=new DateTime(2025,9,12)},
-            new Booking { BookingId=2, RoomNo="102", RoomType="Double", GuestName="Alice Smith", GuestEmail="alice@mail.com", StayedGuestCount=2, DurationOfStay=5, BookedBy="Admin", CheckIn=new DateTime(2025,9,15)}
-        };
+{
+    new Booking { BookingId=1, RoomNo="101", RoomType="Single", GuestName="John Doe", GuestEmail="john@mail.com", StayedGuestCount=1, DurationOfStay=3, BookedBy="HR", CheckIn=new DateTime(2025,9,12), CheckOut=new DateTime(2025,9,12).AddDays(3) },
+    new Booking { BookingId=2, RoomNo="102", RoomType="Double", GuestName="Alice Smith", GuestEmail="alice@mail.com", StayedGuestCount=2, DurationOfStay=5, BookedBy="Admin", CheckIn=new DateTime(2025,9,15), CheckOut=new DateTime(2025,9,15).AddDays(5) },
+    new Booking { BookingId=3, RoomNo="103", RoomType="Single", GuestName="Bob Johnson", GuestEmail="bob@mail.com", StayedGuestCount=1, DurationOfStay=2, BookedBy="HR", CheckIn=new DateTime(2025,9,10), CheckOut=new DateTime(2025,9,12) },
+    new Booking { BookingId=4, RoomNo="104", RoomType="Double", GuestName="Carol White", GuestEmail="carol@mail.com", StayedGuestCount=2, DurationOfStay=4, BookedBy="Admin", CheckIn=new DateTime(2025,9,18), CheckOut=new DateTime(2025,9,22) },
+    new Booking { BookingId=5, RoomNo="105", RoomType="Suite", GuestName="David Brown", GuestEmail="david@mail.com", StayedGuestCount=3, DurationOfStay=6, BookedBy="HR", CheckIn=new DateTime(2025,9,20), CheckOut=new DateTime(2025,9,26) },
+    new Booking { BookingId=6, RoomNo="106", RoomType="Single", GuestName="Emma Davis", GuestEmail="emma@mail.com", StayedGuestCount=1, DurationOfStay=3, BookedBy="Admin", CheckIn=new DateTime(2025,9,22), CheckOut=new DateTime(2025,9,25) },
+    new Booking { BookingId=7, RoomNo="107", RoomType="Double", GuestName="Frank Wilson", GuestEmail="frank@mail.com", StayedGuestCount=2, DurationOfStay=5, BookedBy="HR", CheckIn=new DateTime(2025,9,25), CheckOut=new DateTime(2025,9,30) },
+    new Booking { BookingId=8, RoomNo="108", RoomType="Suite", GuestName="Grace Lee", GuestEmail="grace@mail.com", StayedGuestCount=3, DurationOfStay=7, BookedBy="Admin", CheckIn=new DateTime(2025,9,28), CheckOut=new DateTime(2025,10,5) },
+    new Booking { BookingId=9, RoomNo="109", RoomType="Single", GuestName="Henry King", GuestEmail="henry@mail.com", StayedGuestCount=1, DurationOfStay=2, BookedBy="HR", CheckIn=new DateTime(2025,10,1), CheckOut=new DateTime(2025,10,3) },
+    new Booking { BookingId=10, RoomNo="110", RoomType="Double", GuestName="Isla Scott", GuestEmail="isla@mail.com", StayedGuestCount=2, DurationOfStay=4, BookedBy="Admin", CheckIn=new DateTime(2025,10,3), CheckOut=new DateTime(2025,10,7) },
+    new Booking { BookingId=11, RoomNo="111", RoomType="Suite", GuestName="Jack Hill", GuestEmail="jack@mail.com", StayedGuestCount=3, DurationOfStay=5, BookedBy="HR", CheckIn=new DateTime(2025,10,5), CheckOut=new DateTime(2025,10,10) },
+    new Booking { BookingId=12, RoomNo="112", RoomType="Single", GuestName="Kara Green", GuestEmail="kara@mail.com", StayedGuestCount=1, DurationOfStay=3, BookedBy="Admin", CheckIn=new DateTime(2025,10,8), CheckOut=new DateTime(2025,10,11) },
+    new Booking { BookingId=13, RoomNo="113", RoomType="Double", GuestName="Liam Young", GuestEmail="liam@mail.com", StayedGuestCount=2, DurationOfStay=4, BookedBy="HR", CheckIn=new DateTime(2025,10,10), CheckOut=new DateTime(2025,10,14) },
+    new Booking { BookingId=14, RoomNo="114", RoomType="Suite", GuestName="Mia Adams", GuestEmail="mia@mail.com", StayedGuestCount=3, DurationOfStay=6, BookedBy="Admin", CheckIn=new DateTime(2025,10,12), CheckOut=new DateTime(2025,10,18) },
+    new Booking { BookingId=15, RoomNo="115", RoomType="Single", GuestName="Noah Baker", GuestEmail="noah@mail.com", StayedGuestCount=1, DurationOfStay=2, BookedBy="HR", CheckIn=new DateTime(2025,10,15), CheckOut=new DateTime(2025,10,17) },
+    new Booking { BookingId=16, RoomNo="116", RoomType="Double", GuestName="Olivia Carter", GuestEmail="olivia@mail.com", StayedGuestCount=2, DurationOfStay=5, BookedBy="Admin", CheckIn=new DateTime(2025,10,18), CheckOut=new DateTime(2025,10,23) }
+};
+
+
         FilteredBookings = Bookings.ToList();
     }
 
@@ -182,12 +201,18 @@ else
         SelectedMonth = DateTime.Now.Month;
         SelectedYear = DateTime.Now.Year;
     }
-
-    private async Task ExportExcelClient()
+private async Task ExportExcelClient()
+{
+    if (Grid != null)
     {
-        if (FilteredBookings.Any())
+       var records = await Grid.GetFilteredRecordsAsync();
+       var data = (records as IEnumerable<object>)?.OfType<Booking>().ToList() ?? new List<Booking>();
+
+
+
+        if (data.Any())
         {
-            var data = FilteredBookings.Select(b => new {
+            var exportData = data.Select(b => new {
                 b.BookingId,
                 b.RoomNo,
                 b.RoomType,
@@ -195,17 +220,28 @@ else
                 b.GuestEmail,
                 b.StayedGuestCount,
                 b.DurationOfStay,
+                CheckIn = b.CheckIn?.ToString("dd-MM-yyyy"),
+                CheckOut = b.CheckOut?.ToString("dd-MM-yyyy"),
                 b.BookedBy
             });
-            await JS.InvokeVoidAsync("exportToExcel", data, "MISReport.xlsx");
+
+            await JS.InvokeVoidAsync("exportToExcel", exportData, "MISReport.xlsx");
         }
     }
+}
 
     private async Task ExportPdfClient()
     {
-        if (FilteredBookings.Any())
+        if (Grid != null)
+    {
+       var records = await Grid.GetFilteredRecordsAsync();
+       var data = (records as IEnumerable<object>)?.OfType<Booking>().ToList() ?? new List<Booking>();
+
+
+
+        if (data.Any())
         {
-            var data = FilteredBookings.Select(b => new {
+            var exportData = data.Select(b => new {
                 b.BookingId,
                 b.RoomNo,
                 b.RoomType,
@@ -213,10 +249,14 @@ else
                 b.GuestEmail,
                 b.StayedGuestCount,
                 b.DurationOfStay,
+                CheckIn = b.CheckIn?.ToString("dd-MM-yyyy"),
+                CheckOut = b.CheckOut?.ToString("dd-MM-yyyy"),
                 b.BookedBy
             });
-            await JS.InvokeVoidAsync("exportToPDF", data, "MISReport.pdf");
+
+            await JS.InvokeVoidAsync("exportToPDF", exportData, "MISReport.pdf");
         }
+    }
     }
 
     public class Booking
@@ -227,8 +267,9 @@ else
         public string GuestName { get; set; } = string.Empty;
         public string GuestEmail { get; set; } = string.Empty;
         public int StayedGuestCount { get; set; }
+        public DateTime? CheckIn { get; set; }
+        public DateTime? CheckOut { get; set; } 
         public int DurationOfStay { get; set; }
         public string BookedBy { get; set; } = string.Empty;
-        public DateTime? CheckIn { get; set; }
     }
 }
