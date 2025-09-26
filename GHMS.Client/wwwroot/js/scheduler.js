@@ -1,3 +1,4 @@
+// ---------------- Add custom styles ----------------
 if (!document.getElementById('scheduler-styles')) {
     var style = document.createElement('style');
     style.id = 'scheduler-styles';
@@ -49,39 +50,130 @@ if (!document.getElementById('scheduler-styles')) {
     document.head.appendChild(style);
 }
  
-// ---------------- Initialize Scheduler ----------------
 window.initScheduler = function (selectedRoom = "All") {
     var bookings = JSON.parse(localStorage.getItem("roomBookings")) || [];
     var guestHouses = JSON.parse(localStorage.getItem("guestHouses")) || [];
  
-    // Build room resources dynamically
     var roomResources = guestHouses.map(gh => ({
         text: gh.GuestName,
-        id: gh.GuestName,
+        id: gh.RoomId,
         RoomId: gh.RoomId,
         GuestName: gh.GuestName,
         color: '#' + Math.floor(Math.random() * 16777215).toString(16)
     }));
  
-    // Configure resources based on room selection
     var resources = [{
-        field: 'Room',
+        field: 'RoomId',
         title: 'Room',
         name: 'Rooms',
         allowMultiple: false,
-        dataSource: selectedRoom === "All" ? roomResources : [{ text: selectedRoom, id: selectedRoom, color: '#0078D7' }],
+        dataSource: selectedRoom === "All"
+            ? roomResources
+            : roomResources.filter(r => r.RoomId == selectedRoom),
         textField: 'text',
         idField: 'id',
         colorField: 'color'
     }];
  
-    // Filter bookings for selected room
-    var dataSource = selectedRoom === "All" ? bookings : bookings.filter(b => b.Room === selectedRoom);
+    var dataSource = selectedRoom === "All"
+        ? bookings
+        : bookings.filter(b => b.RoomId == selectedRoom);
  
-    // Destroy previous scheduler if exists
     if (window.schedulerObj) window.schedulerObj.destroy();
  
-    // Initialize the scheduler
+    // ---------------- Custom Editor Template ----------------
+    var customEditorTemplate = function () {
+        return `
+        <div class="custom-editor" style="padding: 0; margin: 0;">
+            <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 24px 20px 12px 20px; max-width: 600px; margin: auto;">
+                <input type="hidden" name="RoomId" />
+ 
+                <!-- Booking Type -->
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: 500;">Booking Type</label>
+                    <select class="e-field e-input" name="BookingType" style="width:100%; margin-top: 4px;">
+                        <option value="">Select Booking Type</option>
+                        <option>Confirm</option>
+                        <option>Tentative Booking</option>
+                        <option>Block Room</option>
+                    </select>
+                </div>
+ 
+                <!-- Usual Fields -->
+                <div class="usual-fields">
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">First Name</label>
+                            <input class="e-field e-input" type="text" name="Fname" style="width:100%; margin-top: 4px;" />
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Last Name</label>
+                            <input class="e-field e-input" type="text" name="Lname" style="width:100%; margin-top: 4px;" />
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Gender</label>
+                            <select class="e-field e-input" name="Gender" style="width:100%; margin-top: 4px;">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Email</label>
+                            <input class="e-field e-input" type="email" name="Email" style="width:100%; margin-top: 4px;" />
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Mobile</label>
+                            <input class="e-field e-input" type="text" name="Mobile" style="width:100%; margin-top: 4px;" />
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Occupancy Category</label>
+                            <input class="e-field e-input" type="text" name="OccupancyCategory" style="width:100%; margin-top: 4px;" />
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Department</label>
+                            <select class="e-field e-input" name="Department" style="width:100%; margin-top: 4px;">
+                                <option value="">Select Department</option>
+                                <option>Guest</option>
+                                <option>New Joiner</option>
+                                <option>HR</option>
+                                <option>IT</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-weight: 500;">Band Level</label>
+                            <input class="e-field e-input" type="text" name="BandLevel" style="width:100%; margin-top: 4px;" />
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- Check In / Check Out / Remarks (always visible) -->
+                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div style="flex: 1;">
+                        <label style="font-weight: 500;">Check In</label>
+                        <input class="e-field" type="datetime-local" name="CheckIn" style="width:100%; margin-top: 4px;" />
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-weight: 500;">Check Out</label>
+                        <input class="e-field" type="datetime-local" name="CheckOut" style="width:100%; margin-top: 4px;" />
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: 500;">Reason</label>
+                    <textarea class="e-field e-input" name="Remarks" style="width:100%; margin-top: 4px; min-height: 38px;"></textarea>
+                </div>
+            </div>
+        </div>
+        `;
+    };
+ 
+    // ---------------- Initialize the Scheduler ----------------
     window.schedulerObj = new ej.schedule.Schedule({
         height: '600px',
         width: '100%',
@@ -97,84 +189,118 @@ window.initScheduler = function (selectedRoom = "All") {
                 subject: { name: 'Subject' },
                 startTime: { name: 'StartTime' },
                 endTime: { name: 'EndTime' },
-                resourceId: 'Room'
+                resourceId: 'RoomId'
             }
         },
-        showQuickInfo: true,
+        showQuickInfo: false,
         showHeaderBar: false,
+        editorTemplate: customEditorTemplate,
  
-        // ---------------- Prevent duplicate & past bookings ----------------
+        // ---------------- Popup Open Logic ----------------
         popupOpen: function (args) {
-            if (args.type === "QuickInfo") {
-                args.cancel = true;
+            if (args.type === "QuickInfo") args.cancel = true;
  
-                var now = new Date();
-                if (args.startTime < now) {
-                    alert("⛔ You cannot create a booking in the past!");
-                    return;
+            if (args.type === "Editor") {
+                if (args.data && !args.data.Id) {
+                    var start = args.data.StartTime ? new Date(args.data.StartTime) : new Date();
+                    var end = args.data.EndTime ? new Date(args.data.EndTime) : new Date(start.getTime() + 30 * 60000);
+ 
+                    function formatLocalDateTime(date) {
+                        const pad = n => n.toString().padStart(2, "0");
+                        return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + "T" + pad(date.getHours()) + ":" + pad(date.getMinutes());
+                    }
+ 
+                    setTimeout(() => {
+                        document.querySelector("input[name='CheckIn']").value = formatLocalDateTime(start);
+                        document.querySelector("input[name='CheckOut']").value = formatLocalDateTime(end);
+ 
+                        const roomIdInput = document.querySelector("input[name='RoomId']");
+                        if (roomIdInput) {
+                            roomIdInput.value = args.data.resourceIds && args.data.resourceIds.length > 0
+                                ? args.data.resourceIds[0]
+                                : (selectedRoom !== "All" ? selectedRoom : guestHouses[0].RoomId);
+                        }
+                    }, 50);
                 }
  
-                // ✅ Always pick the correct room
-                var room;
-                if (selectedRoom === "All") {
-                    room = args.resource?.[0]?.id || roomResources[0].id;
-                } else {
-                    room = selectedRoom;
+                // Toggle usual fields based on Booking Type
+                var bookingTypeSelect = document.querySelector("select[name='BookingType']");
+                var usualFields = document.querySelector(".usual-fields");
+ 
+                function toggleFields() {
+                    if (bookingTypeSelect.value === "Block Room") usualFields.style.display = "none";
+                    else usualFields.style.display = "block";
                 }
  
-                // Check for duplicate booking in same room & overlapping time
-                var conflict = bookings.some(b =>
-                    b.Room === room &&
-                    ((args.startTime >= new Date(b.StartTime) && args.startTime < new Date(b.EndTime)) ||
-                     (args.endTime > new Date(b.StartTime) && args.endTime <= new Date(b.EndTime)) ||
-                     (args.startTime <= new Date(b.StartTime) && args.endTime >= new Date(b.EndTime)))
-                );
- 
-                if (conflict) {
-                    alert("⚠️ This room is already booked during the selected time!");
-                    return;
-                }
- 
-                // Unique ID
-                var newId = Date.now();
- 
-                // Find GuestHouse details
-                var roomDetails = guestHouses.find(gh => gh.GuestName === room);
- 
-                // Create booking with full details
-                var newBooking = {
-                    Id: newId,
-                    Subject: "Booked",
-                    StartTime: args.startTime,
-                    EndTime: args.endTime,
-                    Room: room,
-                    RoomId: roomDetails?.RoomId || 0,
-                    GuestName: roomDetails?.GuestName || "",
-                    Location: roomDetails?.Location || "",
-                    resourceIds: [room]
-                };
- 
-                // Save booking
-                bookings.push(newBooking);
-                localStorage.setItem("roomBookings", JSON.stringify(bookings));
- 
-                // Add booking to scheduler
-                window.schedulerObj.addEvent(newBooking);
+                bookingTypeSelect.addEventListener("change", toggleFields);
+                toggleFields();
             }
         },
  
-        // ---------------- Prevent moving bookings to the past ----------------
         actionBegin: function (args) {
-            if (args.requestType === "eventChange" || args.requestType === "eventCreate") {
-                var data = args.data instanceof Array ? args.data[0] : args.data;
-                if (new Date(data.StartTime) < new Date()) {
-                    alert("⛔ Bookings cannot be moved or created in the past!");
-                    args.cancel = true;
-                }
-            }
-        }
-    });
+    var bookings = JSON.parse(localStorage.getItem("roomBookings")) || [];
+    var guestHouses = JSON.parse(localStorage.getItem("guestHouses")) || [];
  
+    if (args.requestType === "eventCreate") {
+        var newBooking = Array.isArray(args.data) ? args.data[0] : args.data;
+        if (!newBooking) { args.cancel = true; return; }
+ 
+        // ---------------- Validate Booking Type ----------------
+        if (!newBooking.BookingType || newBooking.BookingType.trim() === "") {
+            alert("⚠️ Please select a Booking Type!");
+            args.cancel = true;
+            return;
+        }
+ 
+        // ---------------- Prevent saving "Block Room" ----------------
+        if (newBooking.BookingType === "Block Room") {
+            alert("⚠️ 'Block Room' bookings cannot be saved!");
+            args.cancel = true;  // cancel creation
+            return;
+        }
+ 
+        var selectedRoomId = args.data.resourceIds?.[0] || (selectedRoom !== "All" ? selectedRoom : guestHouses[0]?.RoomId);
+        var roomDetails = guestHouses.find(gh => gh.RoomId == selectedRoomId);
+        if (!roomDetails) { alert("⚠️ Selected room does not exist!"); args.cancel = true; return; }
+ 
+        var checkIn = new Date(newBooking.CheckIn || newBooking.StartTime);
+        var checkOut = new Date(newBooking.CheckOut || newBooking.EndTime);
+ 
+        if (checkIn < new Date()) { alert("⛔ Bookings cannot be created in the past!"); args.cancel = true; return; }
+ 
+        // ---------------- Conflict Check ----------------
+        var conflict = bookings.some(b =>
+            b.RoomId === roomDetails.RoomId &&
+            ((checkIn >= new Date(b.CheckIn || b.StartTime) && checkIn < new Date(b.CheckOut || b.EndTime)) ||
+             (checkOut > new Date(b.CheckIn || b.StartTime) && checkOut <= new Date(b.CheckOut || b.EndTime)) ||
+             (checkIn <= new Date(b.CheckIn || b.StartTime) && checkOut >= new Date(b.CheckOut || b.EndTime)))
+        );
+        if (conflict) { alert("⚠️ This room is already booked during the selected time!"); args.cancel = true; return; }
+ 
+        // ---------------- Store Booking ----------------
+        newBooking.Id = newBooking.Id || Date.now();
+        newBooking.RoomId = selectedRoomId;
+        newBooking.Room = roomDetails.GuestName;
+        newBooking.resourceId = selectedRoomId;
+        newBooking.resourceIds = [selectedRoomId];
+        newBooking.GuestName = roomDetails.GuestName;
+        newBooking.Location = roomDetails.Location || "";
+        newBooking.StartTime = newBooking.CheckIn;
+        newBooking.EndTime = newBooking.CheckOut;
+        newBooking.Subject = newBooking.Subject || "Booked";
+ 
+        bookings.push(newBooking);
+        localStorage.setItem("roomBookings", JSON.stringify(bookings));
+    }
+ 
+    if (args.requestType === "eventChange") {
+        var data = Array.isArray(args.data) ? args.data[0] : args.data;
+        if (!data) return;
+        if (new Date(data.StartTime) < new Date()) { alert("⛔ Bookings cannot be moved to the past!"); args.cancel = true; }
+    }
+}
+ 
+    });
     window.schedulerObj.appendTo('#Scheduler');
  
     // ---------------- Custom Header ----------------
@@ -190,7 +316,7 @@ window.initScheduler = function (selectedRoom = "All") {
     <div class="center-section">
         <select id="roomFilter">
             <option value="All">All Rooms</option>
-            ${guestHouses.map(gh => `<option value="${gh.GuestName}">${gh.GuestName}</option>`).join('')}
+            ${guestHouses.map(gh => `<option value="${gh.RoomId}">${gh.GuestName}</option>`).join('')}
         </select>
     </div>
     <div class="right-section">
@@ -240,6 +366,6 @@ window.initScheduler = function (selectedRoom = "All") {
     var roomFilter = document.getElementById('roomFilter');
     roomFilter.value = selectedRoom;
     roomFilter.addEventListener('change', function (e) {
-        window.initScheduler(e.target.value); // reload scheduler dynamically
+        window.initScheduler(e.target.value === "All" ? "All" : parseInt(e.target.value));
     });
 };
