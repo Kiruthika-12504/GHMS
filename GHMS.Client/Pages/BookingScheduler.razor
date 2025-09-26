@@ -1,19 +1,16 @@
 @page "/room-scheduler"
- 
 @inject IJSRuntime JS
 @using GHMS.Layout
 @layout MainLayout
- 
-<h3>Guest House Scheduler</h3>
- 
- 
+
+
+
 <div id="Scheduler"></div>
- 
- 
+
 @code {
     private string selectedRoom = "All";
     private List<GuestHouse> guestHouses = new();
- 
+
     protected override async Task OnInitializedAsync()
     {
         var data = await JS.InvokeAsync<string>("localStorage.getItem", "guestHouses");
@@ -22,21 +19,22 @@
             guestHouses = System.Text.Json.JsonSerializer.Deserialize<List<GuestHouse>>(data) ?? new();
         }
     }
- 
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            // Ensure JS has loaded
             await JS.InvokeVoidAsync("initScheduler", selectedRoom);
         }
     }
- 
+
     private async Task OnRoomChange(ChangeEventArgs e)
     {
         selectedRoom = e.Value?.ToString() ?? "All";
         await JS.InvokeVoidAsync("initScheduler", selectedRoom);
     }
- 
+
     public class GuestHouse
     {
         public Guid Id { get; set; }
